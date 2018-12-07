@@ -4,6 +4,21 @@ CoreAnimation相关学习记录
 CoreAnimation相关学习记录
 <!--CoreAnimation头文件包含-->
 
+<!--Transaction官方解释-->
+
+>Transactions are CoreAnimation's mechanism for batching multiple layer-
+  tree operations into atomic updates to the render tree. **Every modification to the layer tree requires a transaction to be part of.**  <br><br>CoreAnimation supports two kinds of transactions, "explicit" transactions
+  and "implicit" transactions.
+  <br><br>Explicit transactions are where the programmer calls `[CATransaction begin] `
+  before modifying the layer tree, and `[CATransaction commit]`<br>afterwards.<br><br>Implicit transactions are created automatically by CoreAnimation when the
+  layer tree is modified by a thread without an active transaction.
+  They are committed automatically when the thread's **run-loop next
+  iterates**. In some circumstances (i.e. no run-loop, or the run-loop
+  is blocked) it may be necessary to use explicit transactions to get
+  timely render tree updates. 
+  
+
+
 ```objc
 #import <QuartzCore/CAAnimation.h>✅
 #import <QuartzCore/CADisplayLink.h>✅
@@ -380,3 +395,36 @@ CoreAnimation相关学习记录
 
 @end
 ```
+
+![例子1-view和layer.gif](https://upload-images.jianshu.io/upload_images/3058688-c5020249f9161c7e.gif?imageMogr2/auto-orient/strip)
+
+![例子2-1关闭事务action.gif](https://upload-images.jianshu.io/upload_images/3058688-80c2d535d39fa90c.gif?imageMogr2/auto-orient/strip)
+
+![例子2-1开启事务action.gif](https://upload-images.jianshu.io/upload_images/3058688-ccea1755fe4a74a3.gif?imageMogr2/auto-orient/strip)
+
+![例子3-直接添加子view对比.gif](https://upload-images.jianshu.io/upload_images/3058688-9649cfbe14be142d.gif?imageMogr2/auto-orient/strip)
+
+![例子4-1-view设置layerdelegate为view.gif](https://upload-images.jianshu.io/upload_images/3058688-17446b855fd5c8a3.gif?imageMogr2/auto-orient/strip)
+
+![例子4-2-设置view的layerdelegate为nil.gif](https://upload-images.jianshu.io/upload_images/3058688-30dff72f78edea90.gif?imageMogr2/auto-orient/strip)
+
+![例子5-actionForLayer的返回时机-结果.png](https://upload-images.jianshu.io/upload_images/3058688-a12a4d2da3db9f0a.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+
+![例子5-actionForLayer的返回时机.png](https://upload-images.jianshu.io/upload_images/3058688-0d9f611db97eff88.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+
+![例子6-CA和POP对比.gif](https://upload-images.jianshu.io/upload_images/3058688-3d224250ff3e6942.gif?imageMogr2/auto-orient/strip)
+
+![例子7-例子发射器.gif](https://upload-images.jianshu.io/upload_images/3058688-4983cd546a35b171.gif?imageMogr2/auto-orient/strip)
+
+![popdemo-衰减动画.gif](https://upload-images.jianshu.io/upload_images/3058688-882ef27e798f6f5b.gif?imageMogr2/auto-orient/strip)
+
+![popdemo-组合1.gif](https://upload-images.jianshu.io/upload_images/3058688-f5cffed95dcd4e11.gif?imageMogr2/auto-orient/strip)
+
+![popdemo-组合2.gif](https://upload-images.jianshu.io/upload_images/3058688-ea0f31811df67714.gif?imageMogr2/auto-orient/strip)
+
+![popdemo-组合3.gif](https://upload-images.jianshu.io/upload_images/3058688-6cf95082b34a1347.gif?imageMogr2/auto-orient/strip)
+
+![popdemo-CADisplayLink.gif](https://upload-images.jianshu.io/upload_images/3058688-5dc1f6d0ac341cd5.gif?imageMogr2/auto-orient/strip)
+
+![popdemo-spring动画.gif](https://upload-images.jianshu.io/upload_images/3058688-bed516523b5e2b2a.gif?imageMogr2/auto-orient/strip)
+
