@@ -1,0 +1,76 @@
+//
+//  QHPrefixHeader.pch
+//  imqiuhang
+//
+//  Created by imqiuhang on 15/8/20.
+//  Copyright (c) 2015年 imqiuhang. All rights reserved.
+//
+
+#ifndef QHPrefixHeader_pch
+#define QHPrefixHeader_pch
+#ifdef __OBJC__
+
+//System
+#import <UIKit/UIKit.h>
+#import <Foundation/Foundation.h>
+#import "UIView+design.h"
+
+//#import "Masonry.h"
+
+//Define
+//#import "Macrodefine.h"
+//#import "BSLocalization.h"
+//#import "BSApiDefine.h"
+//#import "BSUIDefine.h"
+//#import "BSGlobeDefine.h"
+#import "POP.h"
+//Util
+#import "CommUtil.h"
+//#import "Constant.h"
+//#import "BSStaticDataContext.h"
+//#import "BSCommHUD.h"
+
+
+//Category
+#import "NSObject+ObjectExtend.h"
+#import "NSDate+DateExtension.h"
+#import "NSTimer+Block.h"
+//#import "UIView+BlocksKit.h"
+#import "NSDictionary+DataSecurity.h"
+#import "NSArray+DataSecurity.h"
+#import "UIColor+ColorExtension.h"
+#import "UITextView+Placeholder.h"
+#import "NSString+StringExtension.h"
+#import "UILabel+LabelExtension.h"
+#import "UIButton+ButtonExtension.h"
+#import "UIImage+ImageExtension.h"
+#import "UIScrollView+ScrollViewExtension.h"
+#import "UITextView+Placeholder.h"
+#import "UIDevice+DeviceExtension.h"
+#import "Masonry.h"
+//
+////Network
+//#import "NetworkDataManager.h"
+//#import "NetworkRequest.h"
+//#import "BSApplicationHelper.h"
+//#import "BSPageSouceClickRouteManager.h"
+//
+////Root
+//#import "RootView.h"
+//#import "RootTableViewCell.h"
+//#import "RootCollectionViewCell.h"
+#import "RootViewController.h"
+//#import "RootListViewController.h"
+//#import "RootNavigationController.h"
+//
+////Model
+//#import "BSBaseEntityModel.h"
+//
+////Manager
+//
+//#import "BSLoginManager.h"
+//#import "BSAppConfigLoadManager.h"
+
+#endif
+
+#endif
