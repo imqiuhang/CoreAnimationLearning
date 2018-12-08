@@ -1,10 +1,8 @@
 # CoreAnimation相关学习的愉快探讨
----
 ##### 本篇文章主要是CoreAnimation行为层面的一些探讨以及和第三方动画库的原理和效果的一些对比，和介绍用法不同，本文旨在通过各种小demo为更好的理解动画实现的一些机制做探讨，用的更加从容。作者才疏学浅，有错误的地方以及补充欢迎在[issues](https://github.com/imqiuhang/CoreAnimationLearning/issues)中提出，第一时间更正。
 
 
 # 相关链接
----
 >* [Apple Core Animation Programming Guide](https://developer.apple.com/library/archive/documentation/Cocoa/Conceptual/CoreAnimation_guide/Introduction/Introduction.html)
 >* [facebook pop](https://github.com/facebook/pop)
 >* [popping-pop guide](https://github.com/schneiderandre/popping)
@@ -12,7 +10,6 @@
 >* [本文章demo仓库](https://github.com/imqiuhang/CoreAnimationLearning)
 
 # 本文目录
----
 >* Apple对于动画交互的偏爱
 >* CATransaction-事务，重点揭示core animation偷偷干的那些事！
 >* 显式事务和隐式事务，动画action-探讨layer被view支配的恐惧
@@ -22,7 +19,6 @@
 >* 粒子系统-CAEmitterCell
 
 # CoreAnimation 目录
----
 ######✅表示本文涉及到，‼️表示重点探讨
 <!--CoreAnimation头文件包含-->
 
