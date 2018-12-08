@@ -13,7 +13,7 @@
 ---
 因此，本片文章主要是针对CoreAnimation行为层面的一些探讨，通过各种小demo更好的理解动画实现的一些机制，以及分析开源第三方动画库的原理和效果做一些侧面的比较。由于才疏学浅，错误在所难免，有错误的地方以及补充欢迎在[issues](https://github.com/imqiuhang/CoreAnimationLearning/issues)中提出，第一时间更正，谢谢！
 
-###☑️@TODO 
+### ☑️@TODO 
 Core Animation相关，大部分绘制和计算都是系统在后台支持的，我们只需要简单的提供参数，关于系统如何使用硬件加速以及在不增加CPU负担的前提下实现动画的流畅和顺滑的会在下一篇文章中进行整理。
 
 ### 相关链接
@@ -32,7 +32,7 @@ Core Animation相关，大部分绘制和计算都是系统在后台支持的，
 >* 粒子系统-CAEmitterCell
 
 ### CoreAnimation 目录
-######✅表示本文涉及到，‼️表示重点探讨
+###### ✅表示本文涉及到，‼️表示重点探讨
 <!--CoreAnimation头文件包含-->
 
 ```objc
