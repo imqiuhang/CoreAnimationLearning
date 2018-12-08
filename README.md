@@ -236,9 +236,9 @@ self.view.backgroundColor = [UIColor redColor];
 
 既然可以手动begin和commit提交事务，而且有一个`+ (void)setDisableActions:(BOOL)flag`方法，那么我们通过像提交一个动画一样手动去提交一个事务看看和隐式事务是否有什么区别。
 
-####通过上面CATransaction的官方文档，只要将layer的属性修改包装在begin和commit之间就行了，那么我们试一下吧。
+#### 通过上面CATransaction的官方文档，只要将layer的属性修改包装在begin和commit之间就行了，那么我们试一下吧。
 
-###例子2
+### 例子2
 例子非常简单，VC的view左边放layer1，右边放layer2，右边的事务我们手动提交，开关控制右边layer2 DisableActions的值，点击按钮同时改变backgroundColor属性，并且手动提交右边layer2的事务。
 <!--例子2代码-->
   
@@ -395,7 +395,7 @@ self.view.backgroundColor = [UIColor redColor];
 ##### 那么问题来了，我们都知道view只不过是layer的一个代理而已啊，文档上也是这么说的啊
 >view is layer's delegate
 
-####所以刚刚清醒又陷入到迷惑之中：对哦，这和我add一个view还是add一个layer有毛关系哦。凭什么view就没隐式动画？view里面不也是有个layer负责这些吗！！
+#### 所以刚刚清醒又陷入到迷惑之中：对哦，这和我add一个view还是add一个layer有毛关系哦。凭什么view就没隐式动画？view里面不也是有个layer负责这些吗！！
 
 所以带着疑惑，我们换个思路，假如我们add view1的layer呢，是否有隐式动画？也就是把例子1中`[self.view addSubview:view1]`改成`[self.view.layer addSublayer:self.view1.layer]`试试看效果，直接看代码
 
@@ -705,5 +705,123 @@ self.view1.backgroundColor = [UIColor redColor];
 ```
 在运行时只会提交一次修改， layoutSubviews也只会调用一次,很Apple。
 
+当然了，我们也可以直接自己去指定layer的delegate，并且实现相关的方法返回一个我们想要的隐式动画，这是文档上的官方例子，当然我们要根据上面的表格中对应属性锁对应的action类型来返回一个正确的action
+
+```objc
+- (id<CAAction>)actionForLayer:(CALayer *)theLayer
+                        forKey:(NSString *)theKey {
+    CATransition *theAnimation=nil;
+ 
+    if ([theKey isEqualToString:@"contents"]) {
+ 
+        theAnimation = [[CATransition alloc] init];
+        theAnimation.duration = 1.0;
+        theAnimation.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseIn];
+        theAnimation.type = kCATransitionPush;
+        theAnimation.subtype = kCATransitionFromRight;
+    }
+    return theAnimation;
+}
+```
 
 
+---
+---
+
+### 其实说到了动画，我们不得不说下layer的model tree结构，以及在动画和非动画时候的model tree结构,下面两张是Apple文档里的官方图片
+
+![树结构1.png](https://upload-images.jianshu.io/upload_images/3058688-b89b37365451c465.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+
+![树结构2.png](https://upload-images.jianshu.io/upload_images/3058688-8a0f0984dbf4dc54.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+
+
+这里直接应用一下其他作者写的一个例子
+
+>在CALayer内部，它控制着两个属性：presentationLayer(以下称为P)和modelLayer（以下称为M）。P只负责显示，M只负责数据的存储和获取。我们对layer的各种属性赋值比如frame，实际上是直接对M的属性赋值，而P将在每一次屏幕刷新的时候回到M的状态。比如此时M的状态是1，P的状态也是1，然后我们把M的状态改为2，那么此时P还没有过去，也就是我们看到的状态P还是1，在下一次屏幕刷新的时候P才变为2。而我们几乎感知不到两次屏幕刷新之间的间隙，所以感觉就是我们一对M赋值，P就过去了。P就像是瞎子，M就像是瘸子，瞎子背着瘸子，瞎子每走一步（也就是每次屏幕刷新的时候）都要去问瘸子应该怎样走（这里的走路就是绘制内容到屏幕上），瘸子没法走，只能指挥瞎子背着自己走。可以简单的理解为：一般情况下，任意时刻P都会回到M的状态。<br><br>而当一个CAAnimation（以下称为A）加到了layer上面后，A就把M从P身上挤下去了。现在P背着的是A，P同样在每次屏幕刷新的时候去问他背着的那个家伙，A就指挥它从fromValue到toValue来改变值。而动画结束后，A会自动被移除，这时P没有了指挥，就只能大喊“M你在哪”，M说我还在原地没动呢，于是P就顺声回到M的位置了。这就是为什么动画结束后我们看到这个视图又回到了原来的位置，是因为我们看到在移动的是P，而指挥它移动的是A，M永远停在原来的位置没有动，动画结束后A被移除，P就回到了M的怀里。
+动画结束后，P会回到M的状态（当然这是有前提的，因为动画已经被移除了，我们可以设置fillMode来继续影响P），但是这通常都不是我们动画想要的效果。我们通常想要的是，动画结束后，视图就停在结束的地方，并且此时我去访问该视图的属性（也就是M的属性），也应该就是当前看到的那个样子。按照官方文档的描述，我们的CAAnimation动画都可以通过设置modelLayer到动画结束的状态来实现P和M的同步。<br>
+作者：DHUsesAll <br>
+来源：CSDN <br>
+原文：https://blog.csdn.net/u013282174/article/details/50388546 <br>
+
+---
+
+
+#### 所以总结一下就是动画中的view要获取其最接近的状态比如现在的位置则要通过layer.presentationLayer来获取其中的属性。因此需要注意在动画中的元素在处理用户交互，判断点击等的-hitTest:需要用presentationLayer去判断，也就是动画中的师徒获取frame等相关属性需要用presentationLayer来获取才是最接近的
+
+灵魂交互图^_^
+
+![树结构-3.png](https://upload-images.jianshu.io/upload_images/3058688-144aacc765d20eeb.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+
+至于刷新时机以及渲染会在下一篇中做探讨。
+
+
+---
+---
+---
+
+### 下面总结一下CAAnimation相关
+
+![常用动画](https://upload-images.jianshu.io/upload_images/3058688-37bc3c288f804a39.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+
+
+其他的animation类型想必都已经用的非常熟练了，不再重复，CATransition其实是个比较好用的转场动画，比如图片的切换，文字的切换都是效果非常好的，而且也不需要实例化几个元素来回切换
+
+代码
+
+```objc
+
+//update卡片的时候设置文字和图片之前添加转场动画即可
+[self.titleLabel.layer addAnimation:self.defaulutTransitionAnimation forKey:kTransitionAnimationName];
+ self.titleLabel.text = note.title;
+    
+    @weakify(self);
+    [self.headImageView ht_setImageWithDefault:note.unify_coverURL  completed:^(UIImage * _Nullable image, NSError * _Nullable error, SDImageCacheType cacheType, NSURL * _Nullable imageURL) {
+        @strongify(self);
+        if (image&&self) {
+            /* headImageView transition */
+            [self.headImageView.layer addAnimation:self.defaulutTransitionAnimation forKey:kTransitionAnimationName];
+        }
+    }];
+
+- (CATransition *)defaulutTransitionAnimation {
+    
+    CATransition *animation = CATransition.animation;
+    animation.duration = kTransitionAnimationDuration;
+    //有几个效果不错的类型，也可以设置子类型，比如方向等
+    animation.type = kCATransitionFade;
+    animation.removedOnCompletion = YES;
+    return animation;
+}
+```
+
+效果
+
+![转场动画.gif](https://upload-images.jianshu.io/upload_images/3058688-43364f4ff1eb14bc.gif?imageMogr2/auto-orient/strip)
+
+### 通过动画对象layer的CAMediaTiming协议控制动画的暂停，开始，倒退，自定义进度等，这个是官方的文档的例子。
+
+
+```objc
+//暂停动画
+-(void)pauseLayer:(CALayer*)layer {
+   CFTimeInterval pausedTime = [layer convertTime:CACurrentMediaTime() fromLayer:nil];
+   layer.speed = 0.0;
+   layer.timeOffset = pausedTime;
+}
+ 
+ //开始动画
+-(void)resumeLayer:(CALayer*)layer {
+   CFTimeInterval pausedTime = [layer timeOffset];
+   layer.speed = 1.0;
+   layer.timeOffset = 0.0;
+   layer.beginTime = 0.0;
+   CFTimeInterval timeSincePause = [layer convertTime:CACurrentMediaTime() fromLayer:nil] - pausedTime;
+   layer.beginTime = timeSincePause;
+}
+
+//倒退，结合repeatCount = MAXFLOAT实现反复动画
+layer.autoreverses = YES;
+
+```
+
+#### 当然，设置动画的speed为0，就可以通过timeOffset自定义控制动画的进度了。
