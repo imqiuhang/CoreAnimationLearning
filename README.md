@@ -3,12 +3,12 @@
 >* If you are writing iOS apps, you are using Core Animation whether you know it or not.
 >
 >* You may never need to use Core Animation directly, but when you do you should understand the role that Core Animation plays as part of your app’s infrastructure.
->
->以上是Apple在CoreAnimation指导的前言中的前两句话，我们翻译之
->
->第一句：**当你编写iOS应用的时候，不管你知不知道Core Animation这个东西，你都在使用它**。也就是说我们在日常编写iOS应用的时候一些不起眼的操作都会涉及到Core Animation的操作，只不过可能这些操作是系统自动帮我们做的，也就是‘**隐式**’的操作而我们忽略了他们的存在。
->
->第二句：我们可能**不会直接的使用**Core Animation，**但是当我们使用相关功能的时候应该要了解Core Animation在背后默默的支持**(这句是我瞎翻译的)
+
+以上是Apple在CoreAnimation指导的前言中的前两句话的引用，我们翻译之
+
+第一句：**当你编写iOS应用的时候，不管你知不知道Core Animation这个东西，你都在使用它**。也就是说我们在日常编写iOS应用的时候一些不起眼的操作都会涉及到Core Animation的操作，只不过可能这些操作是系统自动帮我们做的，也就是‘**隐式**’的操作而我们忽略了他们的存在。
+
+第二句：我们可能**不会直接的使用**Core Animation，**但是当我们使用相关功能的时候应该要了解Core Animation在背后默默的支持**(这句是我瞎翻译的)
 
 ---
 因此，本片文章主要是针对CoreAnimation行为层面的一些探讨，通过各种小demo更好的理解动画实现的一些机制，以及分析开源第三方动画库的原理和效果做一些侧面的比较。由于才疏学浅，错误在所难免，有错误的地方以及补充欢迎在[issues](https://github.com/imqiuhang/CoreAnimationLearning/issues)中提出，第一时间更正，谢谢！
