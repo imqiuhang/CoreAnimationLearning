@@ -1,4 +1,5 @@
-# 一，CoreAnimation相关学习的愉快探讨
+# CoreAnimation相关学习的愉快探讨
+###### @author imqiuhang
 ### 前言
 >* If you are writing iOS apps, you are using Core Animation whether you know it or not.
 >
@@ -153,9 +154,9 @@ Most of the animations you create using Core Animation involve the modification 
 
 >事务是CoreAnimation 将layer tree多个修改操作批量提交给渲染树的机制。 对layer tree的修改都需要事务作为其一部分。
 >
-CoreAnimation支持两种事务，显式事务和隐式事务。
-显式事务是程序员在修改层树之前调用[CATransaction begin]，然后是[CATransaction commit]。
-当layer tree 修改时，如果没有有效的事务，CoreAnimation会自动创建隐式事务。
+>CoreAnimation支持两种事务，显式事务和隐式事务。
+>显式事务是程序员在修改层树之前调用[CATransaction begin]，然后是[CATransaction commit]。
+>当layer tree 修改时，如果没有有效的事务，CoreAnimation会自动创建隐式事务。
 
 >它们在线程的runloop下一次迭代时自动提交。 在一些情况下（没有runloop，或者runloop被阻塞），可能有必要使用显式事务来及时地呈现树更新。
 管理了一堆不能访问的事务。CATransaction没有属性或者实例方法，也不能用+alloc和-init方法创建它。只能用+begin和+commit入栈出栈一次事务的提交。
@@ -211,6 +212,179 @@ CoreAnimation支持两种事务，显式事务和隐式事务。
 
 首先我在百花之中第一眼就看到了**animationDuration**这个方法以及他的注释，**Defaults to 1/4s.也就是0.25秒**，这使得我恍然大悟
 
-#####结合上面Apple文档里说的，layer的修改都要事务作为一部分，如果不显示提供事务，则会创建隐式的事务，我们可以理解为事务是对一个可变属性修改的**动画载体**而在这里我们看到了事务里动画默认是0.25秒，所以结合我们的demo，我们已经非常清楚这个过渡动画是如何产生的了。
+##### 结合上面Apple文档里说的，layer的修改都要事务作为一部分，如果不显示提供事务，则会创建隐式的事务，我们可以理解为事务是对一个可变属性修改的**动画载体**而在这里我们看到了事务里动画默认是0.25秒，所以结合我们的demo，我们已经非常清楚这个过渡动画是如何产生的了。
 
-#####layer修改backgroundColor->系统提供了一个修改的动画载体-事务->事务的默认动画时长是0.25秒，因此我们看到了layer非常平滑的颜色改变的过渡效果！Apple牛逼！
+##### layer修改backgroundColor->系统提供了一个修改的动画载体-事务->事务的默认动画时长是0.25秒，因此我们看到了layer非常平滑的颜色改变的过渡效果！Apple牛逼！
+
+然后我们继续看下其他的方法
+
+`+ (void)begin` <br>
+`+ (void)commit`<br>
+`+ (void)setAnimationDuration:(CFTimeInterval)dur`<br>
+`+ (void)setAnimationTimingFunction`<br>
+`+ (void)setCompletionBlock:(nullable void (^)(void))block`<br>
+这几个个方法乍一看和UIView提供的动画方法非常像是吧，只不过把AnimationCurve类型换成了TimingFunction，TimingFunction可以更加灵活一些，本质还是差不多，delegate换成block，嗯，简直孪生兄弟。
+
+```objc
+[UIView beginAnimations:@"animationKey" context:nil];
+[UIView setAnimationCurve:UIViewAnimationCurveEaseInOut];
+[UIView setAnimationDuration:0.25f];
+[UIView setAnimationDelegate:self];
+self.view.backgroundColor = [UIColor redColor];
+[UIView commitAnimations];
+```
+
+既然可以手动begin和commit提交事务，而且有一个`+ (void)setDisableActions:(BOOL)flag`方法，那么我们通过像提交一个动画一样手动去提交一个事务看看和隐式事务是否有什么区别。
+
+####通过上面CATransaction的官方文档，只要将layer的属性修改包装在begin和commit之间就行了，那么我们试一下吧。
+
+###例子2
+例子非常简单，VC的view左边放layer1，右边放layer2，右边的事务我们手动提交，开关控制右边layer2 DisableActions的值，点击按钮同时改变backgroundColor属性，并且手动提交右边layer2的事务。
+<!--例子2代码-->
+  
+```objc
+
+@interface ExplicitTransactionViewController ()
+
+@property (nonatomic,strong)CALayer  *layer2;
+@property (nonatomic,strong)CALayer *layer1;
+@property (nonatomic,strong)UISwitch *switch1;
+
+@end
+
+@implementation ExplicitTransactionViewController
+
+- (void)viewDidLoad {
+
+    /*左边放layer1右边放layer2，开关控制右边layer2是否开启动作，点击按钮同时改变backgroundColor*/
+    
+    /*左右各放一个layer*/
+    self.layer1 = [CALayer layer];
+    self.layer2 = [CALayer layer];
+    [self.view.layer addSublayer:self.layer1]
+    [self.view.layer addSublayer:self.layer2]
+    
+    /*加一个开关，开关控制右边layer是否允许action*/
+    self.switch1 = [UISwitch new];
+    [self.view addSubview:switch1];
+}
+
+- (void)rightBarButtonDidSelected {
+
+    UIColor *color = self.randomColor;
+    self.layer1.backgroundColor = color.CGColor;
+    //右边的layer我们手动提交事务
+    [CATransaction begin];
+    /*默认是NO， 设置YES来禁用action*/
+    [CATransaction setDisableActions:!self.switch1.on];
+    [CATransaction setAnimationDuration:0.25];/*默认的是0.25秒*/
+    self.layer2.backgroundColor = color.CGColor;
+    [CATransaction commit];
+}
+```
+
+我们看下效果
+
+![例子2-1关闭事务action.gif](https://upload-images.jianshu.io/upload_images/3058688-80c2d535d39fa90c.gif?imageMogr2/auto-orient/strip)
+
+![例子2-1开启事务action.gif](https://upload-images.jianshu.io/upload_images/3058688-ccea1755fe4a74a3.gif?imageMogr2/auto-orient/strip)
+
+首先，第一张图我们设置了右边的layer setDisableActions为YES，那么和我们预期的一样，左边的layer有过渡动画，右边的没有
+在看第二张图，我们手动提交了右边layer的事务，并且setDisableActions为NO，也就是开启了action，由于设置的动画时长是默认的0.25，所以我们看到和我们所想的一样，两边的过渡没有任何区别，因为主要设置的参数一样，隐式和显式的事务没有任何区别，当然我们可以设置显式事务的其他参数，例如动画时长，特别是setAnimationTimingFunction来达到我们想要的变化效果。
+
+根据文档，事务可以嵌套 需要等最外层的事务commit之后才会提交到runloop
+
+```objc
+ 
+[CATransaction begin];
+
+	  [CATransaction begin];
+	         ...
+	  [CATransaction commit];
+  ...
+  
+[CATransaction commit];
+
+```
+
+##### 当然了，我们在文档的很多地方都看到“Animatable Properties”,也就是可动画的属性，那么必然也会有不可动画属性，只有Animatable标记的属性的改变的事务才会有动画，这点我们在稍后会有提到。Animatable一般都在.h的属性注释中标记，可以在CALayer.中看到，列举两个例子
+```objc
+/* Unlike NSView, each Layer in the hierarchy has an implicit frame
+ * rectangle, a function of the `position', `bounds', `anchorPoint',
+ * and `transform' properties. When setting the frame the `position'
+ * and `bounds.size' are changed to match the given frame. */
+
+@property CGRect frame;
+
+/** Geometry and layer hierarchy properties. **/
+
+/* The bounds of the layer. Defaults to CGRectZero. Animatable. */
+
+@property CGRect bounds;
+
+/* The position in the superlayer that the anchor point of the layer's
+ * bounds rect is aligned to. Defaults to the zero point. Animatable. */
+
+@property CGPoint position;
+```
+
+可以很明显的看出layer的frame不是Animatable属性，而bounds和position是Animatable，可以两个结合代替frame
+在官方文档中是这么描述的
+
+> frame ,This property is not animatable. You can achieve the same results by animating the bounds and position properties.
+
+备注:B代表default implied CABasicAnimation，在下方表格B-1中<br>
+    T代表default implied CATransition，在下方表格B-2中<br>
+
+##### 表格A-1,layer的属性和默认动画值
+
+| 属性 | 默认动画 | 
+| :------: | :------: | 
+| anchorPoint | B | 
+| backgroundColor | T|
+| backgroundFilters |T|
+| borderColor |B|
+| borderWidth |B|
+| bounds |B|
+| compositingFilter |T|
+| contents |B|
+| contentsRect |B|
+| cornerRadius |B|
+| doubleSided |不支持|
+| filters |B|
+| frame |不支持|
+| hidden |B|
+| mask |B|
+| masksToBounds |B|
+| opacity |B|
+| position |B|
+| shadowColor |B|
+| shadowOffset |B|
+| shadowOpacity |B|
+| shadowPath |B|
+| shadowRadius |B|
+| sublayers |B|
+| sublayerTransform |B|
+| transform |B|
+| zPosition |B|
+
+
+##### 表格B-1-default implied CABasicAnimation(B)
+
+| Description | Value | 
+| :------: | :------: | 
+| Class | CABasicAnimation | 
+| Duration |0.25 seconds, or the duration of the current transaction|
+|Key path|Set to the property name of the layer.|
+
+
+##### 表格B-1-代表default implied CATransition(T)
+
+| Description | Value | 
+|:------: | :------: | 
+| Class | CATransition | 
+| Duration |0.25 seconds, or the duration of the current transaction|
+| Type |Fade (kCATransitionFade)|
+|Start progress|0.0|
+|End progress|1.0|
+
