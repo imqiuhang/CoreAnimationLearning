@@ -388,3 +388,322 @@ self.view.backgroundColor = [UIColor redColor];
 |Start progress|0.0|
 |End progress|1.0|
 
+
+至此，我们已经非常清楚的了解到了layer是如何通过事务来达到默认动画的效果，我们也可以大致解释例子1中，为什么layer有默认动画，而view没有
+
+##### 这时候我们可能非常大声的喊出：因为事务树作用在layer上的而不是view上<br>
+##### 那么问题来了，我们都知道view只不过是layer的一个代理而已啊，文档上也是这么说的啊
+>view is layer's delegate
+
+####所以刚刚清醒又陷入到迷惑之中：对哦，这和我add一个view还是add一个layer有毛关系哦。凭什么view就没隐式动画？view里面不也是有个layer负责这些吗！！
+
+所以带着疑惑，我们换个思路，假如我们add view1的layer呢，是否有隐式动画？也就是把例子1中`[self.view addSubview:view1]`改成`[self.view.layer addSublayer:self.view1.layer]`试试看效果，直接看代码
+
+### 例子3
+
+例子很简单，就是例子1的改版，左边直接放个layer，右边放一个view.layer，点击导航栏按钮，改变两个视图的颜色
+
+<!--例子3代码-->
+  
+```objc
+
+@interface LayerAndViewLayerViewController ()
+
+@property (nonatomic,strong)UIView  *view1;//view
+@property (nonatomic,strong)CALayer *layer1;//layer
+
+@end
+
+@implementation LayerAndViewLayerViewController
+
+- (void)viewDidLoad {
+
+    /*左边放一个layer1，右边放一个view1里面的的layer，改变backgroundColor属性的值*/
+    
+    /* 左边放一个layer1*/
+    self.layer1 = [CALayer layer];
+    [self.view.layer addSublayer:self.layer1];
+    
+    /* 右边放一个View1的layer*/
+    self.view1 = [[UIView alloc] init];
+    [self.view.layer addSublayer:self.view1.layer];
+}
+
+- (void)rightBarButtonDidSelected {
+    /*点击按钮同时赋值同一个颜色*/
+    UIColor *color = self.randomColor;
+    self.view1.layer.backgroundColor = color.CGColor;
+    self.layer1.backgroundColor = color.CGColor;
+}
+```
+看下效果
+
+![例子3-直接添加子view对比.gif](https://upload-images.jianshu.io/upload_images/3058688-9649cfbe14be142d.gif?imageMogr2/auto-orient/strip)
+
+###### 由此可见，和addView还是addLayer并无关系，只要是view中的layer，换句话说只要layer被view管理，那么隐式动画都没有被默认开启，那么view是如果禁用layer的隐式动画？
+
+上面也提到了，view是layer的delegate，也就是layer的管理者，那么我们看下CALayer中这个delegate是什么
+
+```objc
+/* An object that will receive the CALayer delegate methods defined
+ * below (for those that it implements). The value of this property is
+ * not retained. Default value is nil. */
+
+@property(nullable, weak) id <CALayerDelegate> delegate;
+
+```
+也就是这个delegate，layer的delegate默认是nil，也就是直接创建的layer的delegate为nil，而通过view关联的layer默认的delegate为view，那是不是这个原因，我们通过一个例子来看下。
+
+### 例子4
+
+例子也非常简单，左边放一个layer1，右边放一个view1，然后我们改变view1的layer的delegate是否为nil分别测试一下
+
+<!--例子4代码-->
+  
+```objc
+
+@interface LayerDelegateTestViewController ()
+
+@property (nonatomic,strong)UIView  *view1;//view
+@property (nonatomic,strong)CALayer *layer1;//layer
+
+@end
+
+@implementation LayerDelegateTestViewController
+
+- (void)viewDidLoad {
+
+    /*左变放一个layer1，右边放一个view1，改变view1的layer的delegate是否为nil*/;
+    
+    //左边放一个layer
+    self.layer1 = [CALayer layer];
+    [self.view.layer addSublayer:self.layer1];
+    
+    //右边放一个View
+    self.view1 = [[UIView alloc];
+    [self.view addSubview:self.view1];
+    
+    //点击按钮改变view的layer的delegate是否为nil
+    UIButton *button = [UIButton new];
+    [self.view addSubview:button];
+    [button addTarget:self action:@selector(setViewDelegate:) forControlEvents:UIControlEventTouchUpInside];
+}
+
+- (void)rightBarButtonDidSelected {
+    //点击导航栏按钮，同时改变颜色
+    UIColor *color = self.randomColor;
+    self.view1.layer.backgroundColor = color.CGColor;
+    self.layer1.backgroundColor = color.CGColor;
+}
+
+- (void)setViewDelegate:(UIButton *)sender {
+    //点击改变按钮，设置view1.layer.delegate=nil或者view1
+    self.view1.layer.delegate = self.view1.layer.delegate?nil:self.view1;
+}
+
+```
+
+看下效果
+
+###### view1的layer的delegate为view时，也就是delegate不为nil
+
+![例子4-1-view设置layerdelegate为view.gif](https://upload-images.jianshu.io/upload_images/3058688-17446b855fd5c8a3.gif?imageMogr2/auto-orient/strip)
+
+
+###### view1的layer的delegate为nil时
+
+![例子4-2-设置view的layerdelegate为nil.gif](https://upload-images.jianshu.io/upload_images/3058688-30dff72f78edea90.gif?imageMogr2/auto-orient/strip)
+
+
+可能这个gif速度减慢没做好，需要特别仔细的看哈。 可以看出，当右边layer的delegate为view1(默认)的时候，和我们预期一样，直接改变颜色，没有默认效果，而下面layer的delegate我们手动置位nil的时候可以看出左右两个视图都有了默认动画，看来问题就是出在这里，view通过layer的这个delegate支配了layer！
+
+
+#### 但是刚刚官方文档说了layer的改变都会包含在事务，也就是说事务的提交肯定无法取消，那么how?
+原因其实在CATransaction的文档中已经有相关体现，也就是disableActions这个方法，那么何为action，UIView如何通过action来实现对layer的隐式动画的控制？通过翻阅Apple的官方文档其实我们也不难发现。我们先来看下这个delegate中能够和事务中的action联系起来的方法
+
+```objc
+@protocol CALayerDelegate <NSObject>
+@optional
+- (void)layoutSublayersOfLayer:(CALayer *)layer;
+
+/* If defined, called by the default implementation of the
+ * -actionForKey: method. Should return an object implementing the
+ * CAAction protocol. May return 'nil' if the delegate doesn't specify
+ * a behavior for the current event. Returning the null object (i.e.
+ * '[NSNull null]') explicitly forces no further search. (I.e. the
+ * +defaultActionForKey: method will not be called.) */
+
+- (nullable id<CAAction>)actionForLayer:(CALayer *)layer forKey:(NSString *)event;
+
+@end
+
+```
+
+#### 我想都不需要划重点了，看到下面这句我相信已经恍然大悟了
+> Returning the null object (i.e.
+ * '[NSNull null]') explicitly forces no further search
+
+ 也就是说，返回NSNull就停止搜寻，那么隐式事务就拿不到一个action(action是什么待会会讲到，我们这里就认为没有action就相当于事务的disableActions为YES了)，那么也就没有了动画，也就是说UIView通过实现layer的delegate并且返回了NSNull从而达到了禁止隐式事务的目的。
+ 
+不知道你有没有注意到explicitly forces no further search这句话，也就是返回NSNull,Core Animation会停止进一步的搜寻，换句话说如果返回一个nil，那么Core Animation将会继续搜寻一个合适的action？那么哪里搜寻？
+
+这点在文档中有非常详细的介绍，甚至有相关的代码，我直接翻译一下
+
+
+>在一个action被执行之前，layer需要找到要action的相应操作对象。与layer相关的action的是通过修改的属性对应的字符串作为key的。当图层属性改变时，图层会调用其actionForKey:方法来搜索与该key关联的action。在此搜索过程中，您的应用可以在几个点插入自己，并为该键提供相关的操作对象。
+
+>Core Animation按以下顺序查找action对象：
+>
+1. 如果图层具有delegate并且该delegate实现该actionForLayer:forKey:方法，则该图层将调用该方法。delegate实现以下几种情况的其中一个：
+ * 返回一个属性key对应的action，提供默认动画
+ * 返回一个nil如果它不处理这个属性key对应的action，在这种情况下将继续让后面2，3，4的步骤执行搜索。
+ * 返回NSNull对象，在这种情况下，搜索立即结束。也就是没有默认的动画。
+2. 在该layer的actions字典中通过属性key查找action，如果有的话。`@property(nullable, copy) NSDictionary<NSString *, id<CAAction>> *actions;`
+3. 在该layer的style字典中查找包含该键的actions字典。`@property(nullable, copy) NSDictionary *style`（换句话说，style是key-actions的一个字典）
+4. 该图层调用其defaultActionForKey:类方法。
+5. layer提供Core Animation定义的隐式操作（如果有）。
+
+
+>如果某个步骤找到了action，则layer将停止其搜索并执行返回的action。当它找到一个action时，调用该action的runActionForKey:object:arguments:方法来执行该动作。如果为给定的action是CAAnimation的实例，则可以使用该方法的默认实现来执行动画。如果要定义符合CAAction协议的自定义对象，则必须使用对象的该方法实现来采取适当的操作。
+
+
+
+##### 哇，好大一堆哦！我们划个重点，其实抛开七七八八的解释，也就是如果这个layer的delegate被实现了，则通过delegate的actionForLayer:forKey:方法获取，这期间如果返回了NSNull则停止一切搜索，也就是没有action了，如果返回nil,或者压根没有delegate则通过layer自己的几个字典里通过key来找到action
+
+```objc
+@protocol CAAction
+
+/* Called to trigger the event named 'path' on the receiver. The object
+ * (e.g. the layer) on which the event happened is 'anObject'. The
+ * arguments dictionary may be nil, if non-nil it carries parameters
+ * associated with the event. */
+
+- (void)runActionForKey:(NSString *)event object:(id)anObject
+    arguments:(nullable NSDictionary *)dict;
+
+@end
+```
+
+可以看出CAAction也就是一个协议，通过文档不难发现CAAnimation也是一个实现了CAAction协议的action `@interface CAAnimation : NSObject
+    <NSSecureCoding, NSCopying, CAMediaTiming, CAAction>`
+    
+    
+#### 看到这里我们也明白了，其实view通过代理了layer的delegate，实现actionForLayer:forKey:返回NSNull来达到禁用了layer属性改变的默认动画！
+
+语言太过无趣，我们通过两张图来对比下！
+
+![layer被view支配](https://upload-images.jianshu.io/upload_images/3058688-346d36a1b107c789.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+
+![layer自由](https://upload-images.jianshu.io/upload_images/3058688-efa3256f5f6c6bc1.jpeg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+
+其实也很好理解apple为什么这么做，layer是负责动画，渲染等显示相关的，而view负责用户交互，Apple认为view更多的应该是以处理用户事件为主，所以view默认并没有开启隐式动画，而layer负责纯展示，所以在变化的时候加入过渡动画会显得更加平滑，所以在不需要处理用户交互事件的元素上我们可以用layer代替view，好看性能又好，美滋滋。
+
+---
+
+问题又来了，刚理清view如何禁用了过渡动画，那么我们调用UIView的动画的时候为什么能动起来？说好的action不给呢？
+
+```objc
+[UIView beginAnimations:@"animationKey" context:nil];
+[UIView setAnimationCurve:UIViewAnimationCurveEaseInOut];
+[UIView setAnimationDuration:0.25f];
+[UIView setAnimationDelegate:self];
+self.view1.backgroundColor = [UIColor redColor];
+[UIView commitAnimations];
+
+```
+
+或者
+
+```objc
+[UIView animateWithDuration:1 animations:^{
+    self.view1.backgroundColor = [UIColor redColor];
+}];
+```
+
+没有action了，那怎么动?
+
+##### 我们来看个例子，看看究竟action是否永远很死板的返回NSNull！！！
+
+### 例子5
+
+例子也非常的简单，就是添加一个view1，打印一下动画前和加了动画时(应该说在动画提交上下文中)view1的layer actionForLayer:forKey方法返回的值
+
+<!--例子5代码-->
+  
+```objc
+
+@interface LayerActionForLayerTestViewController ()
+
+@property (nonatomic,strong)UIView  *view1;//view
+
+@end
+
+@implementation LayerActionForLayerTestViewController
+
+- (void)viewDidLoad {
+
+    /* 右边放一个View*/
+    self.view1 = [[UIView alloc] init];
+    [self.view addSubview:self.view1];
+
+    NSMutableString *logs = @"".mutableCopy;
+    
+    //打印一下动画前的actionForLayer改变
+    [logs appendFormat:@"动画前：%@\n",[self.view1 actionForLayer:self.view1.layer forKey:@"backgroundColor"]];
+    [self addTextDescrib:logs.copy];
+    
+    //打印一下添加动画后的actionForLayer改变
+    [UIView animateWithDuration:5 animations:^{
+        self.view1.backgroundColor = [UIColor redColor];
+       id value =  [self.view1 actionForLayer:self.view1.layer forKey:@"backgroundColor"];
+        [logs appendString:[NSString stringWithFormat:@"添加动画后：%@",value]];
+        [self addTextDescrib:logs.copy];
+    }];
+}
+
+```
+
+![例子5-actionForLayer的返回时机.png](https://upload-images.jianshu.io/upload_images/3058688-0d9f611db97eff88.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+
+#### 可以很明显的看到，在动画前预料之中，返回NSNull.null,但是在动画的上下文中，既然返回了一个CAAction协议的对象，看下面这张图，我们打印一下，也就是之前文档所说的CAAnimation的子类！
+
+![例子5-actionForLayer的返回时机-结果.png](https://upload-images.jianshu.io/upload_images/3058688-a12a4d2da3db9f0a.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+
+
+### 也就是说在动画的block或者begin commit之间这个context中，view通过layer的delegate竟然又返回了action！十分“鸡贼”!至于如何实现的我们不深入探讨了，总之view通过这个方法在我们手动调用动画的时候，这个方法返回了一个我们想要的动画！
+
+当然了，动画block内如果属性并没有发生实质的变化，也是不会有action返回的，当然也不会有动画过程，并且会立刻回调completion，像下面这两种写法。
+
+```objc
+   self.view.backgroundColor = [UIColor yellowColor];
+    [UIView animateWithDuration:1.f animations:^{
+        self.view.backgroundColor = [UIColor yellowColor];
+    } completion:^(BOOL finished) {
+        //会立刻回调，并且不会返回action
+    }];
+```
+
+```objc
+    self.view.backgroundColor = [UIColor yellowColor];
+    [UIView animateWithDuration:1.f animations:^{
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            self.view.backgroundColor = [UIColor redColor];
+        });
+    } completion:^(BOOL finished) {
+        //虽然颜色变了，但是是延迟，已经出了作用域后才变化的，所以会立刻回调，并且不会返回action
+    }];
+```
+
+
+#### 另外，文档另外一个说明就是多个属性批量提交，那么一个属性多次修改，会提交多个事务吗？答案是不会的，运行时只会提交一个结果。
+
+
+```objc
+    self.view1.width = 100.f;
+    self.view1.width = 100.f;
+    self.view1.width = 100.f;
+```
+在运行时只会提交一次修改， layoutSubviews也只会调用一次,很Apple。
+
+
+
