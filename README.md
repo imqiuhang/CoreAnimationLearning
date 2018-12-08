@@ -1,5 +1,5 @@
 # 一，CoreAnimation相关学习的愉快探讨
-###前言
+### 前言
 >* If you are writing iOS apps, you are using Core Animation whether you know it or not.
 >
 >* You may never need to use Core Animation directly, but when you do you should understand the role that Core Animation plays as part of your app’s infrastructure.
@@ -57,7 +57,7 @@ Core Animation相关，大部分绘制和计算都是系统在后台支持的，
 ```
 ---
 ---
-###正文部分
+### 正文部分
 ❗️备注1：以下所有的代码，为了精简和突出重点，所有的布局代码以及不太相关的代码都已经去掉，完整代码可以在[本文章demo仓库](https://github.com/imqiuhang/CoreAnimationLearning)中下载查看。所以忽略布局相关，可以直接在GIF中看到效果。
 
 ❗️备注2：为了方便更好的看到动画的效果和差异，GIF图片都经过了4倍的缓速。
