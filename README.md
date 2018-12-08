@@ -58,13 +58,56 @@ Core Animation相关，大部分绘制和计算都是系统在后台支持的，
 ---
 ---
 ### 正文部分
-❗️备注1：以下所有的代码，为了精简和突出重点，所有的布局代码以及不太相关的代码都已经去掉，完整代码可以在[本文章demo仓库](https://github.com/imqiuhang/CoreAnimationLearning)中下载查看。所以忽略布局相关，可以直接在GIF中看到效果。
+❗️备注1：以下所有的代码，为了精简和突出重点，所有的**布局代码**以及不太相关的代码都已经去掉，完整代码可以在[本文章demo仓库](https://github.com/imqiuhang/CoreAnimationLearning)中下载查看。所以忽略布局相关，可以直接在GIF中看到效果。
 
 ❗️备注2：为了方便更好的看到动画的效果和差异，GIF图片都经过了4倍的缓速。
 
 ---
 
-首先，我们来看一段非常非常简单的代码，然后运行它，看一下效果
+【例子1】首先，我们来看一段非常非常简单的代码，然后运行它，看一下效果，代码非常简单，在vc的view中左边添加一个layer，右边添加一个view，然后点击导航栏的按钮，同时改变他们的backgroundColor属性。
+
+<!--例子1代码-->
+ 
+```objc
+@interface LayerAndViewViewController ()
+
+@property (nonatomic,strong)UIView  *view1;//view
+@property (nonatomic,strong)CALayer *layer1;//layer
+
+@end
+
+@implementation LayerAndViewViewController
+
+- (void)viewDidLoad {
+     /*左边放一个layer1，右边放一个view1，点击按钮同时改变两个的backgroundColor*/
+    //左边放一个layer
+    self.layer1 = [CALayer layer];
+    [self.view.layer addSublayer:self.layer1]
+    //右边放一个View
+    self.view1 = [[UIView alloc] init];
+    [self.view addSubview:view1];
+}
+
+- (void)rightBarButtonDidSelected {
+    /*点击按钮同时赋值同一个颜色*/
+    UIColor *color = self.randomColor;
+    self.view1.layer.backgroundColor = color.CGColor;
+    self.layer1.backgroundColor = color.CGColor;
+}
+
+@end
+
+```
+
+看一下效果
+
+![例子1-view和layer.gif](https://upload-images.jianshu.io/upload_images/3058688-c5020249f9161c7e.gif?imageMogr2/auto-orient/strip)
+
+
+原本layer和view都是蓝色的，点击change，同时改变为红色，但是我们可以非常明显的看到，左边layer的颜色从蓝色变成红色的过程中，经历了一系列的颜色过度而右边的view几乎是非常突兀的变成了红色。
+
+这个不禁引起了我们的思考，按理说，我们没有书写任何的动画代码，理论上，变化应该都和右边的view一样，非常直接的变成我们要的红色，可为何左边的layer“偷偷”的给自己加戏？
+
 
 
 
