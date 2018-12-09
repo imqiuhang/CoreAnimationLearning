@@ -68,13 +68,11 @@ Core Animation相关，大部分绘制和计算都是系统在后台支持的，
 ### 正文部分
 ---
 
-### CATransaction-事务
----
-
 ❗️备注1：以下所有的代码，为了精简和突出重点，所有的**布局代码**以及不太相关的代码都已经去掉，完整代码可以在[本文章demo仓库](https://github.com/imqiuhang/CoreAnimationLearning)中下载查看。所以忽略布局相关，可以直接在GIF中看到效果。
 
 ❗️备注2：为了方便更好的看到动画的效果和差异，GIF图片都经过了4倍的缓速。
 
+### CATransaction-事务
 ---
 
 【例子1】首先，我们来看一段非常非常简单的代码，然后运行它，看一下效果，代码非常简单，在vc的view中左边添加一个layer，右边添加一个view，然后点击导航栏的按钮，同时改变他们的backgroundColor属性。
