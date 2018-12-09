@@ -1,6 +1,6 @@
 # CoreAnimation相关学习的愉快探讨
 ###### @author imqiuhang
-### 前言
+### 📣前言
 >* If you are writing iOS apps, you are using Core Animation whether you know it or not.
 >
 >* You may never need to use Core Animation directly, but when you do you should understand the role that Core Animation plays as part of your app’s infrastructure.
@@ -23,7 +23,7 @@ Core Animation is not a drawing system itself. It is an infrastructure for compo
 ### ☑️@TODO 
 Core Animation相关，大部分绘制和计算都是系统在后台支持的，我们只需要简单的提供参数，关于系统如何使用硬件加速以及在不增加CPU负担的前提下实现动画的流畅和顺滑的会在下一篇文章中进行整理。
 
-### 相关链接
+### 📎相关链接
 >* [Apple Core Animation Programming Guide](https://developer.apple.com/library/archive/documentation/Cocoa/Conceptual/CoreAnimation_guide/Introduction/Introduction.html)
 >* [CAMediaTimingFunction可视化](https://github.com/YouXianMing/Tween-o-Matic-CN)
 >* [layer层级以及坐标系转换](https://developer.apple.com/library/archive/documentation/Cocoa/Conceptual/CoreAnimation_guide/CoreAnimationBasics/CoreAnimationBasics.html#//apple_ref/doc/uid/TP40004514-CH2-SW12)
@@ -32,7 +32,7 @@ Core Animation相关，大部分绘制和计算都是系统在后台支持的，
 >* [AGGeometryKit](https://github.com/agens-no/AGGeometryKit-POP)
 >* [本文章demo仓库](https://github.com/imqiuhang/CoreAnimationLearning)
 
-### 本文目录
+### 📖本文目录
 >* [CATransaction-显式事务和隐式事务，重点揭示core animation偷偷干的那些事](#CATransaction-事务)
 >* [CAAction-探讨layer被view支配的恐惧](#layer与view)
 >* [layer的属性修改与呈现，揭示layer树结构](#layer树结构)
@@ -40,7 +40,7 @@ Core Animation相关，大部分绘制和计算都是系统在后台支持的，
 >* [定时器动画 -基于CADisplaylink的Facebook pop框架的源码分析](#Facebook-pop)
 >* [粒子系统-CAEmitterCell](#粒子系统)
 
-### CoreAnimation 目录
+### 🔍CoreAnimation 目录
 ###### ✅表示本文涉及到，‼️表示重点探讨
 <!--CoreAnimation头文件包含-->
 
