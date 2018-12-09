@@ -5,14 +5,20 @@
 >
 >* You may never need to use Core Animation directly, but when you do you should understand the role that Core Animation plays as part of your app’s infrastructure.
 
-以上是Apple在CoreAnimation指导的前言中的前两句话的引用，我们翻译之
+以上两句话是引用了Apple在CoreAnimation指导文档的前两句，我们翻译之
 
-第一句：**当你编写iOS应用的时候，不管你知不知道Core Animation这个东西，你都在使用它**。也就是说我们在日常编写iOS应用的时候一些不起眼的操作都会涉及到Core Animation的操作，只不过可能这些操作是系统自动帮我们做的，也就是‘**隐式**’的操作而我们忽略了他们的存在。
+>* 第一句：**当你编写iOS应用的时候，不管你知不知道Core Animation这个东西，你都在使用它**。也就是说我们在日常编写iOS应用的时候一些不起眼的操作都会涉及到Core Animation的操作，只不过可能这些操作是系统自动帮我们做的，也就是‘**隐式**’的操作而我们忽略了他们的存在。
 
-第二句：我们可能**不会直接的使用**Core Animation，**但是当我们使用相关功能的时候应该要了解Core Animation在背后默默的支持**(这句是我瞎翻译的)
+>* 第二句：我们可能**不会直接的使用**Core Animation，**但是当我们使用相关功能的时候应该要了解Core Animation在APP中所扮演的角色**
 
----
-因此，本片文章主要是针对CoreAnimation行为层面的一些探讨，通过各种小demo更好的理解动画实现的一些机制，以及分析开源第三方动画库的原理和效果做一些侧面的比较。由于才疏学浅，错误在所难免，有错误的地方以及补充欢迎在[issues](https://github.com/imqiuhang/CoreAnimationLearning/issues)中提出，第一时间更正，谢谢！
+
+以上两句也表明了Apple对于Core Animation的态度：**我们尽量帮你实现，但你也应该了解他。**
+
+>Core Animation Manages Your App’s Content<br>
+Core Animation is not a drawing system itself. It is an infrastructure for compositing and manipulating your app’s content in hardware. At the heart of this infrastructure are layer objects, which you use to manage and manipulate your content.
+
+ 这一句文档诠释了CoreAnimation自身**不是一个绘制系统**，而是一个APP视图**内容的管理**基础系统，这个系统的上层便是**layer**。
+##### 因此,本文中我们重点探讨CoreAnimation是如何管理app’s content in hardware，而如何提交绘制以及绘制的部分将会忽略。通过各种小demo更好的理解动画实现的一些机制和思想，了解"Core Animation所扮演的角色"这样能让我们在编写代码的时候更加的从容和省力。由于才疏学浅，错误在所难免，有错误的地方以及补充欢迎在[issues](https://github.com/imqiuhang/CoreAnimationLearning/issues)中提出，第一时间更正，谢谢！
 
 ### ☑️@TODO 
 Core Animation相关，大部分绘制和计算都是系统在后台支持的，我们只需要简单的提供参数，关于系统如何使用硬件加速以及在不增加CPU负担的前提下实现动画的流畅和顺滑的会在下一篇文章中进行整理。
@@ -794,7 +800,6 @@ self.view1.backgroundColor = [UIColor redColor];
 }
 ```
 
-效果
 
 ![转场动画.gif](https://upload-images.jianshu.io/upload_images/3058688-43364f4ff1eb14bc.gif?imageMogr2/auto-orient/strip)
 
@@ -825,3 +830,388 @@ layer.autoreverses = YES;
 ```
 
 #### 当然，设置动画的speed为0，就可以通过timeOffset自定义控制动画的进度了。
+
+---
+---
+
+### 下面我们从第三方开源动画框架POP入手，侧面对比下CoreAnimation
+
+首先，我们了解到spring动画，即弹簧动画是有着非常好的用户体验的，各种仿真和缓动效果让iOS系统本身和自带应用非常炫酷，但是spring动画本身是iOS9才引入的api,如果我们想要在iOS9以下使用该如何操作呢？
+
+第一中自然是使用先前提到的iOS7 UIView提供的block动画，虽然可以使用的参数比较少，单也能大致的实现一些spring的效果,如下代码可以看到可以传入弹簧的阻尼Damping，初始速率velocity
+
+```objc
+
++ (void)animateWithDuration:(NSTimeInterval)duration
+                      delay:(NSTimeInterval)delay
+     usingSpringWithDamping:(CGFloat)dampingRatio
+      initialSpringVelocity:(CGFloat)velocity
+                    options:(UIViewAnimationOptions)options
+                 animations:(void (^)(void))animations
+                 completion:(void (^)(BOOL))completion;
+
+```
+
+那如果想实现效果更多，自定义能力更强的spring动画如何？这就用到了大名鼎鼎的[facebook pop，开源动画库](https://github.com/facebook/pop)，一款GitHub 2W star的开源框架。Facebook最初是将其用于paper应用，一经推出，便引起了巨大的关注，paper的各种动画效果也是令善于抄袭的产品经理们垂涎三尺。
+
+这里我们不讨论如何使用pop，因为其用法非常简单，和CAAnimation用法几乎完全一致，只是多了些参数，根据pop文档即可，我们先看一下几个效果，其他效果可以下载pop的第三方demo>* [popping-pop guide](https://github.com/schneiderandre/popping)
+
+衰减效果
+
+![popdemo-衰减动画.gif](https://upload-images.jianshu.io/upload_images/3058688-882ef27e798f6f5b.gif?imageMogr2/auto-orient/strip)
+
+![popdemo-组合1.gif](https://upload-images.jianshu.io/upload_images/3058688-f5cffed95dcd4e11.gif?imageMogr2/auto-orient/strip)
+
+![popdemo-组合2.gif](https://upload-images.jianshu.io/upload_images/3058688-ea0f31811df67714.gif?imageMogr2/auto-orient/strip)
+
+![popdemo-组合3.gif](https://upload-images.jianshu.io/upload_images/3058688-6cf95082b34a1347.gif?imageMogr2/auto-orient/strip)
+
+![popdemo-CADisplayLink.gif](https://upload-images.jianshu.io/upload_images/3058688-5dc1f6d0ac341cd5.gif?imageMogr2/auto-orient/strip)
+
+![popdemo-spring动画.gif](https://upload-images.jianshu.io/upload_images/3058688-bed516523b5e2b2a.gif?imageMogr2/auto-orient/strip)
+
+
+#### 来细谈一下POP的实现，从而从侧面对比一下CAAnimation
+
+首先，我们在最上面也提到了，Core Animation提交了动画参数后所做的事情是在后台进程进行操作的，并使用了各种硬件加速等手段达到动画的流畅性，而作为第三方框架，这点是显然做不到的。动画，其显示原理简化一下就是在屏幕刷新的获得改帧对应的layer状态，然后设置，从而达到肉眼可见的动画效果，说白了就是有个定时器，这个定时器就是在屏幕刷新的时候调用，那么这个定时器显而易见就是CADisplayLink了。
+
+定时器有了，使用CADisplayLink即可，那么等CADisplayLink回调的时候我们在设置layer的状态是不是就达到了目的，也就是说给layer一个read和write的方法，在回调的时候调用，让我们看下源码。
+
+首先，既然POP也是通过layer添加一个动画，类似于CAAimation,那么我们找到pop animation的基类，POPAnimator看下他的init做了什么操作，我们去掉Mac os的代码以及加锁等操作的代码，简化的看一下
+
+```objc
+- (instancetype)init
+{
+  self = [super init];
+  if (nil == self) return nil;
+
+  _displayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(render)];
+  _displayLink.paused = YES;
+  [_displayLink addToRunLoop:[NSRunLoop mainRunLoop] forMode:NSRunLoopCommonModes];
+  return self;
+}
+
+```
+可以看到在init的时候，初始化了CADisplayLink这个定时器，并且加了回调render，默认定时器是暂停的，只有当动画add到layer的时候才开始。
+
+我们早往下看下render回调做了什么，我们一层层的往下看，直到实现层，同理我们去掉了加锁等代码方便阅读
+
+```objc
+
+- (void)render
+{
+  CFTimeInterval time = [self _currentRenderTime];
+  [self renderTime:time];
+}
+
+- (void)renderTime:(CFTimeInterval)time
+{
+  [self _renderTime:time items:_list];
+}
+- (void)_renderTime:(CFTimeInterval)time items:(std::list<POPAnimatorItemRef>)items
+{
+  // begin transaction with actions disabled
+  [CATransaction begin];
+  [CATransaction setDisableActions:YES];
+
+  // notify delegate
+  __strong __typeof__(_delegate) delegate = _delegate;
+  [delegate animatorWillAnimate:self];
+
+  // count active animations
+  const NSUInteger count = items.size();
+  if (0 == count) {
+    // unlock
+  } else {
+    // copy list into vector
+    std::vector<POPAnimatorItemRef> vector{ items.begin(), items.end() };
+    for (auto item : vector) {
+      [self _renderTime:time item:item];
+    }
+  }
+  // update display link
+  updateDisplayLink(self);
+  [delegate animatorDidAnimate:self];
+  [CATransaction commit];
+}
+
+```
+
+这里有几个重点就是`[CATransaction setDisableActions:YES]`也印证里我们上面说的在做layer动画的时候最好关闭默认事务的action。
+第二，`[self _renderTime:time item:item]`，这个方法一层层比较多，有兴趣可以直接在源码上看，具体在这个方法里通过read block获取，然后计算，获取当前的状态，然后通过write block给layer当前的状态赋值，具体的计算过程可以在源码中看到，我们看下read和write的block，在POPAnimatableProperty文件中。
+
+```objc
+
+@property (readonly, nonatomic, copy) POPAnimatablePropertyReadBlock readBlock;
+
+/**
+ @abstract Block used to write values from an array of floats into a property.
+ */
+@property (readonly, nonatomic, copy) POPAnimatablePropertyWriteBlock writeBlock;
+
+```
+那么这个block是如何与layer关联起来的，这点pop用了非常简单聪明的办法
+
+```objc
+
+NSString * const kPOPSCNNodeScaleY = @"scnnode.scale.y";
+NSString * const kPOPSCNNodeScaleZ = @"scnnode.scale.z";
+NSString * const kPOPSCNNodeScaleXY = @"scnnode.scale.xy";
+
+typedef struct
+{
+  NSString *name;
+  POPAnimatablePropertyReadBlock readBlock;
+  POPAnimatablePropertyWriteBlock writeBlock;
+  CGFloat threshold;
+} _POPStaticAnimatablePropertyState;
+
+```
+name即动画的kaypath,即已经定义的一些例如kPOPSCNNodeScaleY等，通过kaypath将read white打包到一个结构体中，取的时候通过kaypath直接获取，我们实际看一下
+
+```objc
+static POPStaticAnimatablePropertyState _staticStates[] =
+{
+  /* CALayer */
+
+  {kPOPLayerBackgroundColor,
+    ^(CALayer *obj, CGFloat values[]) {
+      POPCGColorGetRGBAComponents(obj.backgroundColor, values);
+    },
+    ^(CALayer *obj, const CGFloat values[]) {
+      CGColorRef color = POPCGColorRGBACreate(values);
+      [obj setBackgroundColor:color];
+      CGColorRelease(color);
+    },
+    kPOPThresholdColor
+  },
+
+  {kPOPLayerBounds,
+    ^(CALayer *obj, CGFloat values[]) {
+      values_from_rect(values, [obj bounds]);
+    },
+    ^(CALayer *obj, const CGFloat values[]) {
+      [obj setBounds:values_to_rect(values)];
+    },
+    kPOPThresholdPoint
+  },
+...
+
+```
+
+
+既然POP使用了基于屏幕刷新频率的定时器CADisplayLink作为回调源，并且`[_displayLink addToRunLoop:[NSRunLoop mainRunLoop]`也是添加在主线程的loop中，那么主线程如果卡顿是否会影响动画的流畅性？这个是显然的，我们可以通过一个demo来验证一下POP和CA在主线程卡顿时候的表现。
+
+ <!--例子6代码pop和CA对比-->
+  
+### 例子6
+
+例子也很简单，左边放一个view添加CABasicAnimation，右边放一个view添加POPBasicAnimation，然后让主线程sleep5秒，对比一下。
+  
+```objc
+@implementation POPAndCAComparisonViewController
+
+- (void)viewDidLoad {
+
+    /*左边是个带有CA动画的view，右边是POP动画的view，sleep 5秒*/
+    UIView *caView = [[UIView alloc]init];
+    [self.view addSubview:caView];
+    CABasicAnimation *caAnimation = [CABasicAnimation animationWithKeyPath:@"transform.rotation.z"];
+    caAnimation.toValue = @(M_PI);
+    caAnimation.duration = 2.0;
+    caAnimation.repeatCount = 500;
+    [caView.layer addAnimation:caAnimation forKey:@"anim"];
+    
+    UIView *popView = [[UIView alloc]init];
+    [self.view addSubview:popView];
+    POPBasicAnimation *popAnimation = [POPBasicAnimation animationWithPropertyNamed:kPOPLayerRotation];
+    popAnimation.toValue = @(M_PI);
+    popAnimation.duration = 2.0;
+    popAnimation.repeatCount = 500;
+    [popView.layer pop_addAnimation:popAnimation forKey:@"rotation"];
+    popAnimation.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionLinear];
+}
+
+//sleep 5秒
+- (void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
+    sleep(5);
+    //5秒后可以直接手动断点调试,效果也一样
+}
+@end
+```
+
+效果图
+
+![例子6-CA和POP对比.gif](https://upload-images.jianshu.io/upload_images/3058688-3d224250ff3e6942.gif?imageMogr2/auto-orient/strip)
+
+可以很明显的看到在线程sleep也就是阻塞的情况下，pop是停止动画的，而CA的动画仍然在继续，也验证了之前提到的CA的动画是在独立进程中进行的。
+
+POP和CAAnimation对比
+
+
+| options | POP | CAAnimation | 
+|:------: | :------: | :------: | 
+| 支持系统| /|Spring动画 iOS 9| 
+| 原理|POP是使用Objective-C++,基于CADisplayLink的框架，也就是说POP基于一个屏幕刷新频率的定时器的动画框架，如果线程阻塞，则动画停止|提交动画后，QuartzCore框架把动画的参数打包好，然后通过 IPC （处理器）发送给名为 backboardd 的后台处理程序。应用也会发送当前展示在屏幕上的每一个 layer 的信息。也就是说处理CA的动画是在一个独立的进程，独立于APP的存在。线程阻塞，断点什么的都不影响动画，🐂|
+
+总的来说，作为spring动画日常使用，POP还是很优秀的框架，
+iOS7-iOS9也可以用UIView的spring block动画粗略代替相对的效果
+
+---
+---
+
+
+### 粒子系统
+
+在iOS中另外一个性能非常优秀但是可能不怎么常用的动画：CAEmitterCell<br>
+CAEmitterCell，iOS原生粒子动画系统,比较容易实现雪花，弹幕之类的
+粒子发射效果，即使数量较多性能也比较不错。
+
+这个可以实现大量粒子发射的效果，而且性能极佳，具体实现原理我们不细说，看下用法
+
+#### 例子7 - 粒子系统
+
+<!--例子7代码粒子系统-->
+  
+```objc
+#define ScreenWidth [[UIScreen mainScreen] bounds].size.width
+#define ScreenHeight [[UIScreen mainScreen] bounds].size.height
+#define APP_MAIN_WINDOW  [UIApplication sharedApplication].delegate.window
+
+@implementation CAEmitterCellDemoViewController
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    [self setRightBarButtonTitle:@"发射"];
+    self.view.backgroundColor = [UIColor blackColor];
+    [self snow];
+}
+
+- (void)rightBarButtonDidSelected {
+    [self rocket];
+}
+
+- (void)snow {
+    
+    CGRect emitterFrame =  APP_MAIN_WINDOW.bounds;
+    
+    ///生成发射器
+    CAEmitterLayer *emitter = [CAEmitterLayer layer];
+    emitter.frame = emitterFrame;
+    emitter.emitterPosition = CGPointMake(ScreenWidth/2.f, 0);
+    emitter.emitterSize = emitterFrame.size;
+    emitter.emitterMode = kCAEmitterLayerVolume;//发射模式
+    emitter.emitterShape = kCAEmitterLayerLine;//发射源的形状
+    [APP_MAIN_WINDOW.layer addSublayer:emitter];
+    emitter.renderMode = kCAEmitterLayerAdditive;
+    
+    //发射器里面的粒子
+    CAEmitterCell *cell = [[CAEmitterCell alloc] init];
+    cell.contents = (__bridge id)[UIImage imageNamed:@"icon_snowflake"].CGImage;
+    cell.name = @"snow";
+    cell.birthRate = 10;
+    cell.lifetime = 50.f ;
+    cell.velocity = 50;
+    float minSize = 0.05f;
+    float maxSize = 0.35f;
+    cell.scale = (maxSize+minSize)/2.f;
+    cell.scaleRange = (maxSize - minSize)/2.f;
+    cell.velocityRange = 20;
+    cell.emissionLongitude = M_PI;
+    cell.emissionRange = M_PI/4 ;
+    cell.spin = M_PI/12; // 子旋转角度
+    cell.spinRange = M_PI/12;
+    emitter.emitterCells = @[cell];
+    
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(10 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        ///停止发射器的
+        [emitter setValue:@(0) forKeyPath:@"emitterCells.snow.birthRate"];
+    });
+}
+
+- (void)rocket {
+    
+    ///创建
+    CAEmitterLayer *fireworksEmitter = [CAEmitterLayer layer];
+    fireworksEmitter.emitterSize = CGSizeZero;
+    fireworksEmitter.emitterMode = kCAEmitterLayerOutline;//发射模式
+    fireworksEmitter.emitterShape = kCAEmitterLayerLine;//发射源的形状
+    
+    fireworksEmitter.frame = APP_MAIN_WINDOW.bounds;
+    fireworksEmitter.emitterPosition = CGPointMake(ScreenWidth/2.f, ScreenHeight-80);
+    fireworksEmitter.renderMode = kCAEmitterLayerAdditive;//发射源的渲染模式
+    fireworksEmitter.seed = (arc4random()%100)+1;
+    [APP_MAIN_WINDOW.layer addSublayer:fireworksEmitter];
+    
+    //火箭
+    CAEmitterCell* rocket  = [CAEmitterCell emitterCell];
+    rocket.name = @"rocket";
+    rocket.birthRate = 3;
+    rocket.velocity = 500;
+    rocket.velocityRange = 80;
+    rocket.yAcceleration = 75;
+    rocket.lifetime = 1.02;
+    rocket.contents = (id) [[UIImage imageNamed:@"icon_fireworks_rocket"] CGImage];
+    rocket.scale = 0.6;
+    rocket.emissionRange = (M_PI/6); // 周围发射角度
+    
+    rocket.emissionLongitude = -M_PI/25;
+    
+    //爆炸
+    CAEmitterCell* burst = [CAEmitterCell emitterCell];
+    burst.birthRate = 1.0;
+    burst.velocity = 0;
+    burst.scale = 0.2;
+    burst.lifetime = 0.15;
+    
+    //烟花
+    CAEmitterCell* spark = [CAEmitterCell emitterCell];
+    spark.birthRate = 400;
+    spark.velocity = 125;
+    spark.emissionRange = 2* M_PI;
+    spark.yAcceleration = 75;
+    spark.lifetime = 3;
+    spark.contents = (id) [[UIImage imageNamed:@"icon_fireworks_flower"] CGImage];
+    spark.scaleSpeed =-0.2;
+    spark.greenSpeed =0.5;
+    spark.redSpeed = 1;
+    spark.blueSpeed = 0;
+    spark.alphaSpeed =-0.45;
+    spark.spin = 2* M_PI;
+    spark.spinRange = 2* M_PI;
+    spark.scale = 3.f;
+    spark.alphaRange = 0.3;
+    
+    ///把烟花，爆炸等各种粒子组加入到发射器里
+    fireworksEmitter.emitterCells = [NSArray arrayWithObject:rocket];
+    rocket.emitterCells = [NSArray arrayWithObject:burst];
+    burst.emitterCells = [NSArray arrayWithObject:spark];
+    
+    
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1f * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [fireworksEmitter setValue:@(0) forKeyPath:@"emitterCells.rocket.birthRate"];
+    });
+    
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(3.f * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [fireworksEmitter removeFromSuperlayer];
+    });
+}
+
+@end
+```
+
+其实用法非常简单，就是一生成一个发射器，发射器里可以装很多发射源，和AnimationGroup一样可以指定时间，就是参数比较难调，而且随机性太大，需要花一些时间。
+
+看下效果
+
+![例子7-例子发射器.gif](https://upload-images.jianshu.io/upload_images/3058688-4983cd546a35b171.gif?imageMogr2/auto-orient/strip)
+
+---
+---
+
+### 总结
+
+
+Core Animation相关的东西还是比较多的，有些不太会出现在我们的日常使用当中，特别是一些框架已经默默做的事情，正如Apple文档所说的，我们必须了解其参与的角色，一些隐式的操作有可能会影响到我们日常的显式操作，@TODO**其中还有layer的很多相关还没有提到，会在后续慢慢补充**
+
