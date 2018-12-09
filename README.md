@@ -33,12 +33,12 @@ Core Animation相关，大部分绘制和计算都是系统在后台支持的，
 >* [本文章demo仓库](https://github.com/imqiuhang/CoreAnimationLearning)
 
 ### 本文目录
->* [CATransaction-事务，重点揭示core animation偷偷干的那些事](#事务)
->* 显式事务和隐式事务，CAAction-探讨layer被view支配的恐惧
->* layer的属性修改与呈现，揭示layer树结构
->* CoreAnimation动画整理以及CAMediaTiming，CAMediaTiming相关协议的组合操作
->* 定时器动画 -基于CADisplaylink的Facebook pop框架的源码分析
->* 粒子系统-CAEmitterCell
+>* [CATransaction-显式事务和隐式事务，重点揭示core animation偷偷干的那些事](#CATransaction-事务)
+>* [CAAction-探讨layer被view支配的恐惧](#layer与view)
+>* [layer的属性修改与呈现，揭示layer树结构](#layer树结构)
+>* [CAAnimation动画整理以及CAMediaTiming，CAMediaTiming相关协议的组合操作](#下面总结一下CAAnimation相关)
+>* [定时器动画 -基于CADisplaylink的Facebook pop框架的源码分析](#Facebook pop)
+>* [粒子系统-CAEmitterCell](#粒子系统)
 
 ### CoreAnimation 目录
 ###### ✅表示本文涉及到，‼️表示重点探讨
@@ -65,11 +65,10 @@ Core Animation相关，大部分绘制和计算都是系统在后台支持的，
 #import <QuartzCore/CAValueFunction.h>
 ```
 ---
----
 ### 正文部分
 ---
 
-### 事务
+### CATransaction-事务
 ---
 
 ❗️备注1：以下所有的代码，为了精简和突出重点，所有的**布局代码**以及不太相关的代码都已经去掉，完整代码可以在[本文章demo仓库](https://github.com/imqiuhang/CoreAnimationLearning)中下载查看。所以忽略布局相关，可以直接在GIF中看到效果。
@@ -400,6 +399,9 @@ self.view.backgroundColor = [UIColor redColor];
 |Start progress|0.0|
 |End progress|1.0|
 
+
+### layer与view
+---
 
 至此，我们已经非常清楚的了解到了layer是如何通过事务来达到默认动画的效果，我们也可以大致解释例子1中，为什么layer有默认动画，而view没有
 
@@ -740,6 +742,8 @@ self.view1.backgroundColor = [UIColor redColor];
 ---
 ---
 
+### layer树结构
+---
 ### 其实说到了动画，我们不得不说下layer的model tree结构，以及在动画和非动画时候的model tree结构,下面两张是Apple文档里的官方图片
 
 ![树结构1.png](https://upload-images.jianshu.io/upload_images/3058688-b89b37365451c465.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
@@ -772,6 +776,7 @@ self.view1.backgroundColor = [UIColor redColor];
 ---
 
 ### 下面总结一下CAAnimation相关
+---
 
 ![常用动画](https://upload-images.jianshu.io/upload_images/3058688-37bc3c288f804a39.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
@@ -880,6 +885,8 @@ layer.autoreverses = YES;
 
 ![popdemo-spring动画.gif](https://upload-images.jianshu.io/upload_images/3058688-bed516523b5e2b2a.gif?imageMogr2/auto-orient/strip)
 
+### Facebook pop
+---
 
 #### 来细谈一下POP的实现，从而从侧面对比一下CAAnimation
 
@@ -1073,6 +1080,7 @@ iOS7-iOS9也可以用UIView的spring block动画粗略代替相对的效果
 
 
 ### 粒子系统
+---
 
 在iOS中另外一个性能非常优秀但是可能不怎么常用的动画：CAEmitterCell<br>
 CAEmitterCell，iOS原生粒子动画系统,比较容易实现雪花，弹幕之类的
@@ -1225,3 +1233,4 @@ CAEmitterCell，iOS原生粒子动画系统,比较容易实现雪花，弹幕之
 
 Core Animation相关的东西还是比较多的，有些不太会出现在我们的日常使用当中，特别是一些框架已经默默做的事情，正如Apple文档所说的，我们必须了解其参与的角色，一些隐式的操作有可能会影响到我们日常的显式操作，@TODO**其中还有layer的很多相关还没有提到，会在后续慢慢补充**
 
+[↑↑↑↑回到顶部↑↑↑↑](#readme)
