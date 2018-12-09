@@ -35,8 +35,8 @@ Core Animation相关，大部分绘制和计算都是系统在后台支持的，
 >* CATransaction-事务，重点揭示core animation偷偷干的那些事
 >* 显式事务和隐式事务，CAAction-探讨layer被view支配的恐惧
 >* layer的属性修改与呈现，揭示layer树结构
->* CoreAnimation动画整理以及CAMediaTiming相关操作
->* 定时器动画 -基于CADisplaylink的Facebook pop框架的整理
+>* CoreAnimation动画整理以及CAMediaTiming，CAMediaTiming相关协议的组合操作
+>* 定时器动画 -基于CADisplaylink的Facebook pop框架的源码分析
 >* 粒子系统-CAEmitterCell
 
 ### CoreAnimation 目录
@@ -803,7 +803,7 @@ self.view1.backgroundColor = [UIColor redColor];
 
 ![转场动画.gif](https://upload-images.jianshu.io/upload_images/3058688-43364f4ff1eb14bc.gif?imageMogr2/auto-orient/strip)
 
-### 通过动画对象layer的CAMediaTiming协议控制动画的暂停，开始，倒退，自定义进度等，这个是官方的文档的例子。
+#### 通过动画对象layer的CAMediaTiming协议控制动画的暂停，开始，倒退，自定义进度等，这个是官方的文档的例子。
 
 
 ```objc
@@ -830,6 +830,10 @@ layer.autoreverses = YES;
 ```
 
 #### 当然，设置动画的speed为0，就可以通过timeOffset自定义控制动画的进度了。
+
+#### CAMediaTimingFunction，时间函数，这个就是调参生成自己的变化曲线，没有特别之处，可以在[CAMediaTimingFunction可视化](https://github.com/YouXianMing/Tween-o-Matic-CN)这个工具中进行参数事实查看曲线
+
+![实时效果](https://github.com/YouXianMing/Tween-o-Matic-CN/raw/master/app.png)
 
 ---
 ---
