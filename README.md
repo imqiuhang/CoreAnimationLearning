@@ -26,13 +26,14 @@ Core Animation相关，大部分绘制和计算都是系统在后台支持的，
 ### 相关链接
 >* [Apple Core Animation Programming Guide](https://developer.apple.com/library/archive/documentation/Cocoa/Conceptual/CoreAnimation_guide/Introduction/Introduction.html)
 >* [CAMediaTimingFunction可视化](https://github.com/YouXianMing/Tween-o-Matic-CN)
+>* [layer层级以及坐标系转换](https://developer.apple.com/library/archive/documentation/Cocoa/Conceptual/CoreAnimation_guide/CoreAnimationBasics/CoreAnimationBasics.html#//apple_ref/doc/uid/TP40004514-CH2-SW12)
 >* [facebook pop](https://github.com/facebook/pop)
 >* [popping-pop guide](https://github.com/schneiderandre/popping)
 >* [AGGeometryKit](https://github.com/agens-no/AGGeometryKit-POP)
 >* [本文章demo仓库](https://github.com/imqiuhang/CoreAnimationLearning)
 
 ### 本文目录
->* CATransaction-事务，重点揭示core animation偷偷干的那些事
+>* [CATransaction-事务，重点揭示core animation偷偷干的那些事](### 事务)
 >* 显式事务和隐式事务，CAAction-探讨layer被view支配的恐惧
 >* layer的属性修改与呈现，揭示layer树结构
 >* CoreAnimation动画整理以及CAMediaTiming，CAMediaTiming相关协议的组合操作
@@ -66,6 +67,11 @@ Core Animation相关，大部分绘制和计算都是系统在后台支持的，
 ---
 ---
 ### 正文部分
+---
+
+### 事务
+---
+
 ❗️备注1：以下所有的代码，为了精简和突出重点，所有的**布局代码**以及不太相关的代码都已经去掉，完整代码可以在[本文章demo仓库](https://github.com/imqiuhang/CoreAnimationLearning)中下载查看。所以忽略布局相关，可以直接在GIF中看到效果。
 
 ❗️备注2：为了方便更好的看到动画的效果和差异，GIF图片都经过了4倍的缓速。
