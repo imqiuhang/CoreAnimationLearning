@@ -65,17 +65,22 @@ Core Animation相关，大部分绘制和计算都是系统在后台支持的，
 #import <QuartzCore/CAValueFunction.h>
 ```
 ---
-### 正文部分
----
+## 正文部分
+
+<br>
 
 ❗️备注1：以下所有的代码，为了精简和突出重点，所有的**布局代码**以及不太相关的代码都已经去掉，完整代码可以在[本文章demo仓库](https://github.com/imqiuhang/CoreAnimationLearning)中下载查看。所以忽略布局相关，可以直接在GIF中看到效果。
 
 ❗️备注2：为了方便更好的看到动画的效果和差异，GIF图片都经过了4倍的缓速。
+<br>
+<br>
 
 ### CATransaction-事务
 ---
 
-【例子1】首先，我们来看一段非常非常简单的代码，然后运行它，看一下效果，代码非常简单，在vc的view中左边添加一个layer，右边添加一个view，然后点击导航栏的按钮，同时改变他们的backgroundColor属性。
+#####【例子1】
+
+首先，我们来看一段非常非常简单的代码，然后运行它，看一下效果，代码非常简单，在vc的view中左边添加一个layer，右边添加一个view，然后点击导航栏的按钮，同时改变他们的backgroundColor属性。
 
 <!--例子1代码-->
  
@@ -141,7 +146,7 @@ Most of the animations you create using Core Animation involve the modification 
 
 这个在官方的指导中没有非常详细的介绍，但是我们通过查阅如何显式的提交动画中也能发现触发隐式动画的关键是Transactions，也就是在CATransaction这个类中，首先查阅这个类，并没有属性可以供我们操作，也只有几个静态方法给我们调用，因此我们先看下文档对于这个类的解释。
 
-### CATransaction
+##### CATransaction
 
 <!--Transaction官方解释-->
 
@@ -159,7 +164,7 @@ Most of the animations you create using Core Animation involve the modification 
   
  继续用4级的水平翻译一下
  
-### 事务
+##### 事务
 
 >事务是CoreAnimation 将layer tree多个修改操作批量提交给渲染树的机制。 对layer tree的修改都需要事务作为其一部分。
 >
@@ -247,7 +252,7 @@ self.view.backgroundColor = [UIColor redColor];
 
 #### 通过上面CATransaction的官方文档，只要将layer的属性修改包装在begin和commit之间就行了，那么我们试一下吧。
 
-### 例子2
+##### 【例子2】
 例子非常简单，VC的view左边放layer1，右边放layer2，右边的事务我们手动提交，开关控制右边layer2 DisableActions的值，点击按钮同时改变backgroundColor属性，并且手动提交右边layer2的事务。
 <!--例子2代码-->
   
@@ -411,7 +416,7 @@ self.view.backgroundColor = [UIColor redColor];
 
 所以带着疑惑，我们换个思路，假如我们add view1的layer呢，是否有隐式动画？也就是把例子1中`[self.view addSubview:view1]`改成`[self.view.layer addSublayer:self.view1.layer]`试试看效果，直接看代码
 
-### 例子3
+##### 【例子3】
 
 例子很简单，就是例子1的改版，左边直接放个layer，右边放一个view.layer，点击导航栏按钮，改变两个视图的颜色
 
@@ -466,7 +471,7 @@ self.view.backgroundColor = [UIColor redColor];
 ```
 也就是这个delegate，layer的delegate默认是nil，也就是直接创建的layer的delegate为nil，而通过view关联的layer默认的delegate为view，那是不是这个原因，我们通过一个例子来看下。
 
-### 例子4
+##### 【例子4】
 
 例子也非常简单，左边放一个layer1，右边放一个view1，然后我们改变view1的layer的delegate是否为nil分别测试一下
 
@@ -530,7 +535,7 @@ self.view.backgroundColor = [UIColor redColor];
 可能这个gif速度减慢没做好，需要特别仔细的看哈。 可以看出，当右边layer的delegate为view1(默认)的时候，和我们预期一样，直接改变颜色，没有默认效果，而下面layer的delegate我们手动置位nil的时候可以看出左右两个视图都有了默认动画，看来问题就是出在这里，view通过layer的这个delegate支配了layer！
 
 
-#### 但是刚刚官方文档说了layer的改变都会包含在事务，也就是说事务的提交肯定无法取消，那么how?
+##### 但是刚刚官方文档说了layer的改变都会包含在事务，也就是说事务的提交肯定无法取消，那么how?
 原因其实在CATransaction的文档中已经有相关体现，也就是disableActions这个方法，那么何为action，UIView如何通过action来实现对layer的隐式动画的控制？通过翻阅Apple的官方文档其实我们也不难发现。我们先来看下这个delegate中能够和事务中的action联系起来的方法
 
 ```objc
@@ -551,7 +556,7 @@ self.view.backgroundColor = [UIColor redColor];
 
 ```
 
-#### 我想都不需要划重点了，看到下面这句我相信已经恍然大悟了
+##### 我想都不需要划重点了，看到下面这句我相信已经恍然大悟了
 > Returning the null object (i.e.
  * '[NSNull null]') explicitly forces no further search
 
@@ -636,7 +641,7 @@ self.view1.backgroundColor = [UIColor redColor];
 
 ##### 我们来看个例子，看看究竟action是否永远很死板的返回NSNull！！！
 
-### 例子5
+##### 【例子5】
 
 例子也非常的简单，就是添加一个view1，打印一下动画前和加了动画时(应该说在动画提交上下文中)view1的layer actionForLayer:forKey方法返回的值
 
@@ -677,12 +682,12 @@ self.view1.backgroundColor = [UIColor redColor];
 
 ![例子5-actionForLayer的返回时机.png](https://upload-images.jianshu.io/upload_images/3058688-0d9f611db97eff88.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
-#### 可以很明显的看到，在动画前预料之中，返回NSNull.null,但是在动画的上下文中，既然返回了一个CAAction协议的对象，看下面这张图，我们打印一下，也就是之前文档所说的CAAnimation的子类！
+##### 可以很明显的看到，在动画前预料之中，返回NSNull.null,但是在动画的上下文中，既然返回了一个CAAction协议的对象，看下面这张图，我们打印一下，也就是之前文档所说的CAAnimation的子类！
 
 ![例子5-actionForLayer的返回时机-结果.png](https://upload-images.jianshu.io/upload_images/3058688-a12a4d2da3db9f0a.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
 
-### 也就是说在动画的block或者begin commit之间这个context中，view通过layer的delegate竟然又返回了action！十分“鸡贼”!至于如何实现的我们不深入探讨了，总之view通过这个方法在我们手动调用动画的时候，这个方法返回了一个我们想要的动画！
+##### 也就是说在动画的block或者begin commit之间这个context中，view通过layer的delegate竟然又返回了action！十分“鸡贼”!至于如何实现的我们不深入探讨了，总之view通过这个方法在我们手动调用动画的时候，这个方法返回了一个我们想要的动画！
 
 当然了，动画block内如果属性并没有发生实质的变化，也是不会有action返回的，当然也不会有动画过程，并且会立刻回调completion，像下面这两种写法。
 
@@ -707,7 +712,7 @@ self.view1.backgroundColor = [UIColor redColor];
 ```
 
 
-#### 另外，文档另外一个说明就是多个属性批量提交，那么一个属性多次修改，会提交多个事务吗？答案是不会的，运行时只会提交一个结果。
+##### 另外，文档另外一个说明就是多个属性批量提交，那么一个属性多次修改，会提交多个事务吗？答案是不会的，运行时只会提交一个结果。
 
 
 ```objc
@@ -742,7 +747,8 @@ self.view1.backgroundColor = [UIColor redColor];
 
 ### layer树结构
 ---
-### 其实说到了动画，我们不得不说下layer的model tree结构，以及在动画和非动画时候的model tree结构,下面两张是Apple文档里的官方图片
+
+##### 其实说到了动画，我们不得不说下layer的model tree结构，以及在动画和非动画时候的model tree结构,下面两张是Apple文档里的官方图片
 
 ![树结构1.png](https://upload-images.jianshu.io/upload_images/3058688-b89b37365451c465.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
@@ -760,7 +766,7 @@ self.view1.backgroundColor = [UIColor redColor];
 ---
 
 
-#### 所以总结一下就是动画中的view要获取其最接近的状态比如现在的位置则要通过layer.presentationLayer来获取其中的属性。因此需要注意在动画中的元素在处理用户交互，判断点击等的-hitTest:需要用presentationLayer去判断，也就是动画中的师徒获取frame等相关属性需要用presentationLayer来获取才是最接近的
+##### 所以总结一下就是动画中的view要获取其最接近的状态比如现在的位置则要通过layer.presentationLayer来获取其中的属性。因此需要注意在动画中的元素在处理用户交互，判断点击等的-hitTest:需要用presentationLayer去判断，也就是动画中的师徒获取frame等相关属性需要用presentationLayer来获取才是最接近的
 
 灵魂交互图^_^
 
@@ -812,7 +818,7 @@ self.view1.backgroundColor = [UIColor redColor];
 
 ![转场动画.gif](https://upload-images.jianshu.io/upload_images/3058688-43364f4ff1eb14bc.gif?imageMogr2/auto-orient/strip)
 
-#### 通过动画对象layer的CAMediaTiming协议控制动画的暂停，开始，倒退，自定义进度等，这个是官方的文档的例子。
+##### 通过动画对象layer的CAMediaTiming协议控制动画的暂停，开始，倒退，自定义进度等，这个是官方的文档的例子。
 
 
 ```objc
@@ -838,16 +844,16 @@ layer.autoreverses = YES;
 
 ```
 
-#### 当然，设置动画的speed为0，就可以通过timeOffset自定义控制动画的进度了。
+##### 当然，设置动画的speed为0，就可以通过timeOffset自定义控制动画的进度了。
 
-#### CAMediaTimingFunction，时间函数，这个就是调参生成自己的变化曲线，没有特别之处，可以在[CAMediaTimingFunction可视化](https://github.com/YouXianMing/Tween-o-Matic-CN)这个工具中进行参数事实查看曲线
+##### CAMediaTimingFunction，时间函数，这个就是调参生成自己的变化曲线，没有特别之处，可以在[CAMediaTimingFunction可视化](https://github.com/YouXianMing/Tween-o-Matic-CN)这个工具中进行参数事实查看曲线
 
 ![实时效果](https://github.com/YouXianMing/Tween-o-Matic-CN/raw/master/app.png)
 
----
+### Facebook-pop
 ---
 
-### 下面我们从第三方开源动画框架POP入手，侧面对比下CoreAnimation
+##### 下面我们从第三方开源动画框架POP入手，侧面对比下CoreAnimation
 
 首先，我们了解到spring动画，即弹簧动画是有着非常好的用户体验的，各种仿真和缓动效果让iOS系统本身和自带应用非常炫酷，但是spring动画本身是iOS9才引入的api,如果我们想要在iOS9以下使用该如何操作呢？
 
@@ -883,10 +889,8 @@ layer.autoreverses = YES;
 
 ![popdemo-spring动画.gif](https://upload-images.jianshu.io/upload_images/3058688-bed516523b5e2b2a.gif?imageMogr2/auto-orient/strip)
 
-### Facebook-pop
----
 
-#### 来细谈一下POP的实现，从而从侧面对比一下CAAnimation
+##### 来细谈一下POP的实现，从而从侧面对比一下CAAnimation
 
 首先，我们在最上面也提到了，Core Animation提交了动画参数后所做的事情是在后台进程进行操作的，并使用了各种硬件加速等手段达到动画的流畅性，而作为第三方框架，这点是显然做不到的。动画，其显示原理简化一下就是在屏幕刷新的获得改帧对应的layer状态，然后设置，从而达到肉眼可见的动画效果，说白了就是有个定时器，这个定时器就是在屏幕刷新的时候调用，那么这个定时器显而易见就是CADisplayLink了。
 
@@ -1019,7 +1023,7 @@ static POPStaticAnimatablePropertyState _staticStates[] =
 
  <!--例子6代码pop和CA对比-->
   
-### 例子6
+##### 【例子6】
 
 例子也很简单，左边放一个view添加CABasicAnimation，右边放一个view添加POPBasicAnimation，然后让主线程sleep5秒，对比一下。
   
@@ -1086,7 +1090,7 @@ CAEmitterCell，iOS原生粒子动画系统,比较容易实现雪花，弹幕之
 
 这个可以实现大量粒子发射的效果，而且性能极佳，具体实现原理我们不细说，看下用法
 
-#### 例子7 - 粒子系统
+##### 【例子7】
 
 <!--例子7代码粒子系统-->
   
@@ -1230,5 +1234,9 @@ CAEmitterCell，iOS原生粒子动画系统,比较容易实现雪花，弹幕之
 
 
 Core Animation相关的东西还是比较多的，有些不太会出现在我们的日常使用当中，特别是一些框架已经默默做的事情，正如Apple文档所说的，我们必须了解其参与的角色，一些隐式的操作有可能会影响到我们日常的显式操作，@TODO**其中还有layer的很多相关还没有提到，会在后续慢慢补充**
+
+[↑↑↑↑回到顶部↑↑↑↑](#readme)
+
+[↑↑↑↑回到顶部↑↑↑↑](#readme)
 
 [↑↑↑↑回到顶部↑↑↑↑](#readme)
