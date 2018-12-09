@@ -743,19 +743,30 @@ self.view1.backgroundColor = [UIColor redColor];
 
 
 ---
----
 
 ### layer树结构
 ---
 
-##### 其实说到了动画，我们不得不说下layer的model tree结构，以及在动画和非动画时候的model tree结构,下面两张是Apple文档里的官方图片
+##### 其实说到了动画，我们不得不说下layer的model tree结构，以及在动画和非动画时候的model tree结构,下面的引用是官方的解释，下面两张是Apple文档里的官方图片
+
+>Layer Trees Reflect Different Aspects of the Animation State
+An app using Core Animation has three sets of layer objects. Each set of layer objects has a different role in making the content of your app appear onscreen:
+
+>Objects in the model layer tree (or simply “layer tree”) are the ones your app interacts with the most. The objects in this tree are the model objects that store the target values for any animations. Whenever you change the property of a layer, you use one of these objects.
+Objects in the presentation tree contain the in-flight values for any running animations. Whereas the layer tree objects contain the target values for an animation, the objects in the presentation tree reflect the current values as they appear onscreen. You should never modify the objects in this tree. Instead, you use these objects to read current animation values, perhaps to create a new animation starting at those values.
+Objects in the render tree perform the actual animations and are private to Core Animation.
+Each set of layer objects is organized into a hierarchical structure like the views in your app. In fact, for an app that enables layers for all of its views, the initial structure of each tree matches the structure of the view hierarchy exactly. However, an app can add additional layer objects—that is, layers not associated with a view—into the layer hierarchy as needed. You might do this in situations to optimize your app’s performance for content that does not require all the overhead of a view. Figure 1-9 shows the breakdown of layers found in a simple iOS app. The window in the example contains a content view, which itself contains a button view and two standalone layer objects. Each view has a corresponding layer object that forms part of the layer hierarchy.
+
+也就是说layer包含model layer tree(模型树)，presentation tree(呈现树)和render tree（渲染树，私有）
+
+
 
 ![树结构1.png](https://upload-images.jianshu.io/upload_images/3058688-b89b37365451c465.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
 ![树结构2.png](https://upload-images.jianshu.io/upload_images/3058688-8a0f0984dbf4dc54.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
 
-这里直接应用一下其他作者写的一个例子
+这里直接应用一下其他人的翻译
 
 >在CALayer内部，它控制着两个属性：presentationLayer(以下称为P)和modelLayer（以下称为M）。P只负责显示，M只负责数据的存储和获取。我们对layer的各种属性赋值比如frame，实际上是直接对M的属性赋值，而P将在每一次屏幕刷新的时候回到M的状态。比如此时M的状态是1，P的状态也是1，然后我们把M的状态改为2，那么此时P还没有过去，也就是我们看到的状态P还是1，在下一次屏幕刷新的时候P才变为2。而我们几乎感知不到两次屏幕刷新之间的间隙，所以感觉就是我们一对M赋值，P就过去了。P就像是瞎子，M就像是瘸子，瞎子背着瘸子，瞎子每走一步（也就是每次屏幕刷新的时候）都要去问瘸子应该怎样走（这里的走路就是绘制内容到屏幕上），瘸子没法走，只能指挥瞎子背着自己走。可以简单的理解为：一般情况下，任意时刻P都会回到M的状态。<br><br>而当一个CAAnimation（以下称为A）加到了layer上面后，A就把M从P身上挤下去了。现在P背着的是A，P同样在每次屏幕刷新的时候去问他背着的那个家伙，A就指挥它从fromValue到toValue来改变值。而动画结束后，A会自动被移除，这时P没有了指挥，就只能大喊“M你在哪”，M说我还在原地没动呢，于是P就顺声回到M的位置了。这就是为什么动画结束后我们看到这个视图又回到了原来的位置，是因为我们看到在移动的是P，而指挥它移动的是A，M永远停在原来的位置没有动，动画结束后A被移除，P就回到了M的怀里。
 动画结束后，P会回到M的状态（当然这是有前提的，因为动画已经被移除了，我们可以设置fillMode来继续影响P），但是这通常都不是我们动画想要的效果。我们通常想要的是，动画结束后，视图就停在结束的地方，并且此时我去访问该视图的属性（也就是M的属性），也应该就是当前看到的那个样子。按照官方文档的描述，我们的CAAnimation动画都可以通过设置modelLayer到动画结束的状态来实现P和M的同步。<br>
@@ -776,8 +787,7 @@ self.view1.backgroundColor = [UIColor redColor];
 
 
 ---
----
----
+
 
 ### 下面总结一下CAAnimation相关
 ---
