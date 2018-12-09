@@ -33,7 +33,7 @@ Core Animation相关，大部分绘制和计算都是系统在后台支持的，
 >* [本文章demo仓库](https://github.com/imqiuhang/CoreAnimationLearning)
 
 ### 本文目录
->* [CATransaction-事务，重点揭示core animation偷偷干的那些事](###事务)
+>* [CATransaction-事务，重点揭示core animation偷偷干的那些事](#事务)
 >* 显式事务和隐式事务，CAAction-探讨layer被view支配的恐惧
 >* layer的属性修改与呈现，揭示layer树结构
 >* CoreAnimation动画整理以及CAMediaTiming，CAMediaTiming相关协议的组合操作
