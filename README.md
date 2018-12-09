@@ -37,7 +37,7 @@ Core Animation相关，大部分绘制和计算都是系统在后台支持的，
 >* [CAAction-探讨layer被view支配的恐惧](#layer与view)
 >* [layer的属性修改与呈现，揭示layer树结构](#layer树结构)
 >* [CAAnimation动画整理以及CAMediaTiming，CAMediaTiming相关协议的组合操作](#下面总结一下CAAnimation相关)
->* [定时器动画 -基于CADisplaylink的Facebook pop框架的源码分析](#Facebook pop)
+>* [定时器动画 -基于CADisplaylink的Facebook pop框架的源码分析](#Facebook-pop)
 >* [粒子系统-CAEmitterCell](#粒子系统)
 
 ### CoreAnimation 目录
@@ -885,7 +885,7 @@ layer.autoreverses = YES;
 
 ![popdemo-spring动画.gif](https://upload-images.jianshu.io/upload_images/3058688-bed516523b5e2b2a.gif?imageMogr2/auto-orient/strip)
 
-### Facebook pop
+### Facebook-pop
 ---
 
 #### 来细谈一下POP的实现，从而从侧面对比一下CAAnimation
