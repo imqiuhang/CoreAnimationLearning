@@ -1,3 +1,5 @@
+<!--可以在 https://macdown.uranusjr.com/  下载Markdown支持工具Macdown-->
+
 ### CoreAnimation深入学习的愉快探讨
 ###### @author imqiuhang
 ### 📣前言
@@ -609,9 +611,9 @@ self.view.backgroundColor = [UIColor redColor];
 
 语言太过无趣，我们通过两张图来对比下！
 
-![layer被view支配](https://upload-images.jianshu.io/upload_images/3058688-346d36a1b107c789.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+![layer被view支配](https://upload-images.jianshu.io/upload_images/3058688-346d36a1b107c789.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/700)
 
-![layer自由](https://upload-images.jianshu.io/upload_images/3058688-efa3256f5f6c6bc1.jpeg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+![layer自由](https://upload-images.jianshu.io/upload_images/3058688-efa3256f5f6c6bc1.jpeg?imageMogr2/auto-orient/strip%7CimageView2/2/w/700)
 
 其实也很好理解apple为什么这么做，layer是负责动画，渲染等显示相关的，而view负责用户交互，Apple认为view更多的应该是以处理用户事件为主，所以view默认并没有开启隐式动画，而layer负责纯展示，所以在变化的时候加入过渡动画会显得更加平滑，所以在不需要处理用户交互事件的元素上我们可以用layer代替view，好看性能又好，美滋滋。
 
@@ -680,11 +682,11 @@ self.view1.backgroundColor = [UIColor redColor];
 
 ```
 
-![例子5-actionForLayer的返回时机.png](https://upload-images.jianshu.io/upload_images/3058688-0d9f611db97eff88.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+![例子5-actionForLayer的返回时机.png](https://upload-images.jianshu.io/upload_images/3058688-0d9f611db97eff88.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/700)
 
 ##### 可以很明显的看到，在动画前预料之中，返回NSNull.null,但是在动画的上下文中，既然返回了一个CAAction协议的对象，看下面这张图，我们打印一下，也就是之前文档所说的CAAnimation的子类！
 
-![例子5-actionForLayer的返回时机-结果.png](https://upload-images.jianshu.io/upload_images/3058688-a12a4d2da3db9f0a.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+![例子5-actionForLayer的返回时机-结果.png](https://upload-images.jianshu.io/upload_images/3058688-a12a4d2da3db9f0a.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/700)
 
 
 ##### 也就是说在动画的block或者begin commit之间这个context中，view通过layer的delegate竟然又返回了action！十分“鸡贼”!至于如何实现的我们不深入探讨了，总之view通过这个方法在我们手动调用动画的时候，这个方法返回了一个我们想要的动画！
@@ -761,9 +763,9 @@ Each set of layer objects is organized into a hierarchical structure like the vi
 
 
 
-![树结构1.png](https://upload-images.jianshu.io/upload_images/3058688-b89b37365451c465.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+![树结构1.png](https://upload-images.jianshu.io/upload_images/3058688-b89b37365451c465.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/700)
 
-![树结构2.png](https://upload-images.jianshu.io/upload_images/3058688-8a0f0984dbf4dc54.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+![树结构2.png](https://upload-images.jianshu.io/upload_images/3058688-8a0f0984dbf4dc54.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/700)
 
 
 这里直接应用一下其他人的翻译
@@ -781,7 +783,7 @@ Each set of layer objects is organized into a hierarchical structure like the vi
 
 灵魂交互图^_^
 
-![树结构-3.png](https://upload-images.jianshu.io/upload_images/3058688-144aacc765d20eeb.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+![树结构-3.png](https://upload-images.jianshu.io/upload_images/3058688-144aacc765d20eeb.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/700)
 
 至于刷新时机以及渲染会在下一篇中做探讨。
 
@@ -792,7 +794,7 @@ Each set of layer objects is organized into a hierarchical structure like the vi
 ### 下面总结一下CAAnimation相关
 ---
 
-![常用动画](https://upload-images.jianshu.io/upload_images/3058688-37bc3c288f804a39.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+![常用动画](https://upload-images.jianshu.io/upload_images/3058688-37bc3c288f804a39.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/700)
 
 
 其他的animation类型想必都已经用的非常熟练了，不再重复，CATransition其实是个比较好用的转场动画，比如图片的切换，文字的切换都是效果非常好的，而且也不需要实例化几个元素来回切换
