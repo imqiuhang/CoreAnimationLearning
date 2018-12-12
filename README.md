@@ -26,7 +26,8 @@ Core Animation is not a drawing system itself. It is an infrastructure for compo
 Core Animation相关，大部分绘制和计算都是系统在后台支持的，我们只需要简单的提供参数，关于系统如何使用硬件加速以及在不增加CPU负担的前提下实现动画的流畅和顺滑的会在下一篇文章中进行整理。
 
 ### 📎相关链接
->* [Apple Core Animation Programming Guide](https://developer.apple.com/library/archive/documentation/Cocoa/Conceptual/CoreAnimation_guide/Introduction/Introduction.html)
+>* [Apple Core Animation Programming Guide,推荐](https://developer.apple.com/library/archive/documentation/Cocoa/Conceptual/CoreAnimation_guide/Introduction/Introduction.html)
+>* [Advanced Graphics and Animations for iOS Apps,推荐](https://developer.apple.com/videos/play/wwdc2014/419/)
 >* [CAMediaTimingFunction可视化](https://github.com/YouXianMing/Tween-o-Matic-CN)
 >* [layer层级以及坐标系转换](https://developer.apple.com/library/archive/documentation/Cocoa/Conceptual/CoreAnimation_guide/CoreAnimationBasics/CoreAnimationBasics.html#//apple_ref/doc/uid/TP40004514-CH2-SW12)
 >* [facebook pop](https://github.com/facebook/pop)
