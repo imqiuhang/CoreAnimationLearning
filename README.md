@@ -22,6 +22,14 @@ Core Animation is not a drawing system itself. It is an infrastructure for compo
  这一句文档诠释了CoreAnimation自身**不是一个绘制系统**，而是一个APP视图**内容的管理**基础系统，这个系统的上层便是**layer**。
 ##### 因此,本文中我们重点探讨CoreAnimation是如何管理app’s content in hardware，而如何提交绘制以及绘制的部分将会忽略。通过各种小demo更好的理解动画实现的一些机制和思想，了解"Core Animation所扮演的角色"这样能让我们在编写代码的时候更加的从容和省力。由于才疏学浅，错误在所难免，有错误的地方以及补充欢迎在[issues](https://github.com/imqiuhang/CoreAnimationLearning/issues)中提出，第一时间更正，谢谢！
 
+>* 巨妖有图层，洋葱也有图层，你懂吗？我们都有图层 -- 史莱克
+
+>* Core Animation其实是一个令人误解的命名。你可能认为它只是用来做动画的，但实际上它是从一个叫做Layer Kit这么一个不怎么和动画有关的名字演变而来，所以做动画这只是Core Animation特性的冰山一角。
+
+>* Core Animation是一个复合引擎，它的职责就是尽可能快地组合屏幕上不同的可视内容，这个内容是被分解成独立的图层，存储在一个叫做图层树的体系之中。于是这个树形成了UIKit以及在iOS应用程序当中你所能在屏幕上看见的一切的基础。
+
+以上三句摘自iOS-Core-Animation-Advanced-Techniques译文
+
 ### ☑️@TODO 
 Core Animation相关，大部分绘制和计算都是系统在后台支持的，我们只需要简单的提供参数，关于系统如何使用硬件加速以及在不增加CPU负担的前提下实现动画的流畅和顺滑的会在下一篇文章中进行整理。
 
