@@ -27,6 +27,7 @@ Core Animation相关，大部分绘制和计算都是系统在后台支持的，
 
 ### 📎相关链接
 >* [Apple Core Animation Programming Guide,非常推荐](https://developer.apple.com/library/archive/documentation/Cocoa/Conceptual/CoreAnimation_guide/Introduction/Introduction.html)
+>* [iOS-Core-Animation-Advanced-Techniques翻译版本](https://github.com/AttackOnDobby/iOS-Core-Animation-Advanced-Techniques)
 >* [core animation pipeline,非常推荐](https://developer.apple.com/videos/play/wwdc2014/419/)
 >* [CAMediaTimingFunction可视化](https://github.com/YouXianMing/Tween-o-Matic-CN)
 >* [layer层级以及坐标系转换](https://developer.apple.com/library/archive/documentation/Cocoa/Conceptual/CoreAnimation_guide/CoreAnimationBasics/CoreAnimationBasics.html#//apple_ref/doc/uid/TP40004514-CH2-SW12)
