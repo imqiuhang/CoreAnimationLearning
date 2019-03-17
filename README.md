@@ -1,4 +1,4 @@
-<!--可以在 https://macdown.uranusjr.com/  下载Markdown支持工具Macdown-->
+ <!--可以在 https://macdown.uranusjr.com/  下载Markdown支持工具Macdown-->
 
 ### CoreAnimation深入学习的愉快探讨
 ###### @author imqiuhang
@@ -63,7 +63,7 @@ Core Animation相关，大部分绘制和计算都是系统在后台支持的，
 >* [粒子系统-CAEmitterCell](#粒子系统)
 
 ### 🔍CoreAnimation 目录
-###### ✅表示本文涉及到，‼️表示重点探讨
+###### ✅表示本文涉及到，❤️表示重点探讨
 <!--CoreAnimation头文件包含-->
 
 ```objc
@@ -81,7 +81,7 @@ Core Animation相关，大部分绘制和计算都是系统在后台支持的，
 #import <QuartzCore/CAShapeLayer.h>
 #import <QuartzCore/CATextLayer.h>
 #import <QuartzCore/CATiledLayer.h>
-#import <QuartzCore/CATransaction.h>✅‼️
+#import <QuartzCore/CATransaction.h>✅❤️
 #import <QuartzCore/CATransform3D.h>
 #import <QuartzCore/CATransformLayer.h>
 #import <QuartzCore/CAValueFunction.h>
