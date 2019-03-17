@@ -586,7 +586,7 @@ self.view.backgroundColor = [UIColor redColor];
  
 不知道你有没有注意到explicitly forces no further search这句话，也就是返回NSNull,Core Animation会停止进一步的搜寻，换句话说如果返回一个nil，那么Core Animation将会继续搜寻一个合适的action？那么哪里搜寻？
 
-这点在文档中有非常详细的介绍，甚至有相关的代码，我直接翻译一下
+这点在文档中有非常详细的介绍，甚至有相关的代码，我直接翻译一下 
 
 
 >在一个action被执行之前，layer需要找到要action的相应操作对象。与layer相关的action的是通过修改的属性对应的字符串作为key的。当图层属性改变时，图层会调用其actionForKey:方法来搜索与该key关联的action。在此搜索过程中，您的应用可以在几个点插入自己，并为该键提供相关的操作对象。
