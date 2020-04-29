@@ -1,6 +1,6 @@
  <!--可以在 https://macdown.uranusjr.com/  下载Markdown支持工具Macdown-->
 
-### CoreAnimation深入学习的愉快探讨
+### CoreAnimation的愉快探讨
 ###### @author imqiuhang
 
 ### 📣前言
@@ -34,9 +34,6 @@ Core Animation is not a drawing system itself. It is an infrastructure for compo
 
 
 
-### ☑️@TODO 
-Core Animation相关，大部分绘制和计算都是系统在后台支持的，我们只需要简单的提供参数，关于系统如何使用硬件加速以及在不增加CPU负担的前提下实现动画的流畅和顺滑的会在下一篇文章中进行整理。
-
 ### 📎相关链接
 >* [Apple Core Animation Programming Guide,非常推荐](https://developer.apple.com/library/archive/documentation/Cocoa/Conceptual/CoreAnimation_guide/Introduction/Introduction.html)
 >* [iOS-Core-Animation-Advanced-Techniques翻译版本](https://github.com/AttackOnDobby/iOS-Core-Animation-Advanced-Techniques)
@@ -56,31 +53,7 @@ Core Animation相关，大部分绘制和计算都是系统在后台支持的，
 >* [定时器动画 -基于CADisplaylink的Facebook pop框架的源码分析](#Facebook-pop)
 >* [粒子系统-CAEmitterCell](#粒子系统)
 
-### 🔍CoreAnimation 目录
-###### ✅表示本文涉及到，❤️表示重点探讨
-<!--CoreAnimation头文件包含-->
 
-```objc
-#import <QuartzCore/CAAnimation.h>✅
-#import <QuartzCore/CADisplayLink.h>✅
-#import <QuartzCore/CAEAGLLayer.h>
-#import <QuartzCore/CAEmitterCell.h>✅
-#import <QuartzCore/CAEmitterLayer.h>
-#import <QuartzCore/CAGradientLayer.h>
-#import <QuartzCore/CALayer.h>✅//CAAction✅
-#import <QuartzCore/CAMediaTiming.h>✅
-#import <QuartzCore/CAMediaTimingFunction.h>✅
-#import <QuartzCore/CAReplicatorLayer.h>
-#import <QuartzCore/CAScrollLayer.h>
-#import <QuartzCore/CAShapeLayer.h>
-#import <QuartzCore/CATextLayer.h>
-#import <QuartzCore/CATiledLayer.h>
-#import <QuartzCore/CATransaction.h>✅❤️
-#import <QuartzCore/CATransform3D.h>
-#import <QuartzCore/CATransformLayer.h>
-#import <QuartzCore/CAValueFunction.h>
-```
----
 ## 正文部分
 
 <br>
@@ -91,7 +64,7 @@ Core Animation相关，大部分绘制和计算都是系统在后台支持的，
 <br>
 <br>
 
-### CATransaction-事务
+### CATransaction
 ---
 
 #####【例子1】
