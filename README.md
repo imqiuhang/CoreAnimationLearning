@@ -3,36 +3,6 @@
 ### CoreAnimation的愉快探讨
 ###### @author imqiuhang
 
-### 📣前言
->* If you are writing iOS apps, you are using Core Animation whether you know it or not.
->
->* You may never need to use Core Animation directly, but when you do you should understand the role that Core Animation plays as part of your app’s infrastructure.
-
-以上两句话是引用了Apple在CoreAnimation指导文档的前两句，我们翻译之
-
->* 第一句：**当你编写iOS应用的时候，不管你知不知道Core Animation这个东西，你都在使用它**。也就是说我们在日常编写iOS应用的时候一些不起眼的操作都会涉及到Core Animation的操作，只不过可能这些操作是系统自动帮我们做的，也就是‘**隐式**’的操作而我们忽略了他们的存在。
-
->* 第二句：我们可能**不会直接的使用**Core Animation，**但是当我们使用相关功能的时候应该要了解Core Animation在APP中所扮演的角色**
-
-
-以上两句也表明了Apple对于Core Animation的态度：**我们尽量帮你实现，但你也应该了解他。**
-
->Core Animation Manages Your App’s Content<br>
-Core Animation is not a drawing system itself. It is an infrastructure for compositing and manipulating your app’s content in hardware. At the heart of this infrastructure are layer objects, which you use to manage and manipulate your content.
-
- 这一句文档诠释了CoreAnimation自身**不是一个绘制系统**，而是一个APP视图**内容的管理**基础系统，这个系统的上层便是**layer**。
- 
- >* 巨妖有图层，洋葱也有图层，你懂吗？我们都有图层 -- 史莱克
-
->* Core Animation其实是一个令人误解的命名。你可能认为它只是用来做动画的，但实际上它是从一个叫做Layer Kit这么一个不怎么和动画有关的名字演变而来，所以做动画这只是Core Animation特性的冰山一角。
-
->* Core Animation是一个复合引擎，它的职责就是尽可能快地组合屏幕上不同的可视内容，这个内容是被分解成独立的图层，存储在一个叫做图层树的体系之中。于是这个树形成了UIKit以及在iOS应用程序当中你所能在屏幕上看见的一切的基础。
-
-以上三句摘自iOS-Core-Animation-Advanced-Techniques译文
-
-##### 因此,本文中我们重点探讨CoreAnimation是如何管理app’s content in hardware，而如何提交绘制以及绘制的部分将会忽略。通过各种小demo更好的理解动画实现的一些机制和思想，了解"Core Animation所扮演的角色"这样能让我们在编写代码的时候更加的从容和省力。由于才疏学浅，错误在所难免，有错误的地方以及补充欢迎在[issues](https://github.com/imqiuhang/CoreAnimationLearning/issues)中提出，第一时间更正，谢谢！
-
-
 
 ### 📎相关链接
 >* [Apple Core Animation Programming Guide,非常推荐](https://developer.apple.com/library/archive/documentation/Cocoa/Conceptual/CoreAnimation_guide/Introduction/Introduction.html)
@@ -76,8 +46,8 @@ Core Animation is not a drawing system itself. It is an infrastructure for compo
 ```objc
 @interface LayerAndViewViewController ()
 
-@property (nonatomic,strong)UIView  *view1;//view
-@property (nonatomic,strong)CALayer *layer1;//layer
+@property (nonatomic, strong) UIView  *view1; //view
+@property (nonatomic, strong) CALayer *layer1; //layer
 
 @end
 
@@ -113,12 +83,12 @@ Core Animation is not a drawing system itself. It is an infrastructure for compo
 
 这个不禁引起了我们的思考，按理说，我们没有书写任何的动画代码，理论上，变化应该都和右边的view一样，非常直接的变成我们要的红色，可为何左边的layer“**偷偷”的给自己加戏？**
 
-聪明的我们可能立刻就想起来在前言中我们引用了Apple官方指导的一句话"**当你编写iOS应用的时候，不管你知不知道Core Animation这个东西，你都在使用它**",也就是说可能我们赋值backgroundColor的时候“一不小心”的触发了CA的某个“隐式的”特性，因此我们还是决定从官方文档入手，找到这个“隐身”的东西。
+聪明的我们可能立刻就想起来在前言中我们引用了Apple官方指导的一句话"**当你编写iOS应用的时候，不管你知不知道Core Animation这个东西，你都在使用它**",也就是说可能我们赋值backgroundColor的时候“一不小心”的触发了某个“隐式的”特性，因此我们还是决定从官方文档入手，找到这个“隐身”的东西。
 
 >Layer Modifications Trigger Animations，
 Most of the animations you create using Core Animation involve the modification of the layer’s properties. Like views, layer objects have a bounds rectangle, a position onscreen, an opacity, a transform, and many other visually-oriented properties that can be modified. For most of these properties, changing the property’s value results in the creation of an **implicit** animation whereby the layer animates from the old value to the new value. You can also explicitly animate these properties in cases where you want more control over the resulting animation behavior.
 
-最终我们在文档中找到这么一段话，我用我英语4级多了5分的水平翻译了一下
+最终我们在文档中找到这么一段话，翻译了一下
 
 >图层修改触发动画，您使用Core Animation创建的大多数动画都涉及修改图层的属性。与视图一样，图层对象具有frame，屏幕上的位置，不透明度，变换以及可以修改的许多其他视觉属性。对于大多数这些属性，更改属性的值会导致创建**隐式动画**，从而将图层从旧值设置为新值。如果希望更多地控制生成的动画行为，也可以显式设置这些属性的动画。
 
@@ -249,9 +219,9 @@ self.view.backgroundColor = [UIColor redColor];
 
 @interface ExplicitTransactionViewController ()
 
-@property (nonatomic,strong)CALayer  *layer2;
-@property (nonatomic,strong)CALayer *layer1;
-@property (nonatomic,strong)UISwitch *switch1;
+@property (nonatomic, strong) CALayer  *layer2;
+@property (nonatomic, strong) CALayer *layer1;
+@property (nonatomic, strong) UISwitch *switch1;
 
 @end
 
@@ -415,8 +385,8 @@ self.view.backgroundColor = [UIColor redColor];
 
 @interface LayerAndViewLayerViewController ()
 
-@property (nonatomic,strong)UIView  *view1;//view
-@property (nonatomic,strong)CALayer *layer1;//layer
+@property (nonatomic, strong) UIView  *view1;//view
+@property (nonatomic, strong) CALayer *layer1;//layer
 
 @end
 
@@ -470,8 +440,8 @@ self.view.backgroundColor = [UIColor redColor];
 
 @interface LayerDelegateTestViewController ()
 
-@property (nonatomic,strong)UIView  *view1;//view
-@property (nonatomic,strong)CALayer *layer1;//layer
+@property (nonatomic, strong) UIView  *view1;//view
+@property (nonatomic, strong) CALayer *layer1;//layer
 
 @end
 
